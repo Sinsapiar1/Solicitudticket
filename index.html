@@ -84,6 +84,12 @@
       font-weight: 300;
     }
     
+    .shortcuts {
+      font-size: 0.75rem;
+      opacity: 0.8;
+      margin-top: 4px;
+    }
+    
     .toggle {
       display: flex;
       margin: 24px 24px 0 24px;
@@ -285,10 +291,16 @@
       box-shadow: 0 2px 8px rgba(229, 62, 62, 0.3);
     }
     
-    .actions button.primary:hover {
-      background: var(--red-dark);
+    .actions button.danger {
+      background: #e53e3e;
+      color: var(--white);
+      border: 1px solid #c53030;
+    }
+    
+    .actions button.danger:hover {
+      background: #c53030;
       transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(229, 62, 62, 0.4);
+      box-shadow: 0 4px 12px rgba(197, 48, 48, 0.4);
     }
     
     .actions button:disabled {
@@ -387,12 +399,19 @@
       }
       
       .actions {
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
         gap: 8px;
       }
       
       .actions button {
-        padding: 12px 16px;
+        padding: 12px 8px;
+        font-size: 0.9rem;
+      }
+      
+      /* El botón de WhatsApp ocupa toda la fila inferior */
+      .actions button:last-child {
+        grid-column: 1 / -1;
       }
     }
     
@@ -419,6 +438,15 @@
         align-items: flex-start;
         gap: 8px;
       }
+      
+      .actions button {
+        padding: 10px 6px;
+        font-size: 0.85rem;
+      }
+      
+      .shortcuts {
+        display: none;
+      }
     }
   </style>
 </head>
@@ -427,11 +455,12 @@
     <header>
       <h1>Gestor de Tickets</h1>
       <p class="subtitle">Sistema profesional para gestión de impresiones</p>
+      <p class="shortcuts">Ctrl+Enter: Agregar | Ctrl+Shift+Enter: Enviar | Ctrl+Shift+Del: Limpiar</p>
     </header>
     
     <div class="toggle" role="group" aria-label="Seleccionar tipo de ticket">
-      <button id="btnImp" aria-pressed="true" data-mode="impresion">📄 Impresión</button>
-      <button id="btnReimp" aria-pressed="false" data-mode="reimpresion">🔄 Re-impresión</button>
+      <button id="btnImp" aria-pressed="true" data-mode="impresion">Impresión</button>
+      <button id="btnReimp" aria-pressed="false" data-mode="reimpresion">Re-impresión</button>
     </div>
     
     <div class="content">
@@ -448,9 +477,10 @@
       </div>
       
       <div class="actions">
-        <button id="addBtn" class="secondary">➕ Agregar ticket</button>
-        <button id="copyBtn" class="secondary" style="display: none;">📋 Copiar mensaje</button>
-        <button id="sendBtn" class="primary">📱 Enviar por WhatsApp</button>
+        <button id="addBtn" class="secondary">+ Agregar ticket</button>
+        <button id="clearBtn" class="danger" style="display: none;">x Limpiar todo</button>
+        <button id="copyBtn" class="secondary" style="display: none;">Copiar mensaje</button>
+        <button id="sendBtn" class="primary">Enviar por WhatsApp</button>
       </div>
     </div>
   </div>
@@ -462,20 +492,18 @@
     <div class="ticket-card" data-kind="impresion">
       <div class="header">
         <span>Ticket de Impresión <span class="badge" id="ticketNumber"></span></span>
-        <button class="remove-btn" data-action="remove">🗑️ Eliminar</button>
+        <button class="remove-btn" data-action="remove">x Eliminar</button>
       </div>
       <div class="fields">
         <div class="field">
           <label>Código de Artículo <span class="required">*</span></label>
-          <input type="text" class="codigo" placeholder="Ej: ABC123" required autocomplete="off">
+          <input type="text" class="codigo" placeholder="Solo números: 123456" required autocomplete="off" pattern="[0-9]*" inputmode="numeric">
         </div>
         <div class="field">
           <label>Tipo de Artículo</label>
           <select class="tipo">
-            <option value="Usado">📦 Usado</option>
-            <option value="Reparación">🔧 Reparación</option>
-            <option value="Nuevo">✨ Nuevo</option>
-            <option value="Refurbished">♻️ Refurbished</option>
+            <option value="Nuevo/Usado">Nuevo/Usado</option>
+            <option value="Reparación">Reparación</option>
           </select>
         </div>
         <div class="field">
@@ -490,20 +518,20 @@
     <div class="ticket-card" data-kind="reimpresion">
       <div class="header">
         <span>Ticket de Re-impresión <span class="badge" id="ticketNumber"></span></span>
-        <button class="remove-btn" data-action="remove">🗑️ Eliminar</button>
+        <button class="remove-btn" data-action="remove">x Eliminar</button>
       </div>
       <div class="fields">
         <div class="field">
           <label>ID de Artículo <span class="required">*</span></label>
-          <input type="text" class="idart" placeholder="Ej: 987654" required autocomplete="off">
+          <input type="text" class="idart" placeholder="Solo números: 987654" required autocomplete="off" pattern="[0-9]*" inputmode="numeric">
         </div>
         <div class="field">
           <label>Motivo de Re-impresión</label>
           <select class="motivo">
-            <option value="Etiqueta dañada">🏷️ Etiqueta dañada</option>
-            <option value="Error en datos">❌ Error en datos</option>
-            <option value="Pérdida de etiqueta">📋 Pérdida de etiqueta</option>
-            <option value="Solicitud cliente">👤 Solicitud cliente</option>
+            <option value="Etiqueta dañada">Etiqueta dañada</option>
+            <option value="Error en datos">Error en datos</option>
+            <option value="Pérdida de etiqueta">Pérdida de etiqueta</option>
+            <option value="Solicitud cliente">Solicitud cliente</option>
           </select>
         </div>
         <div class="field">
@@ -522,6 +550,7 @@
     const addBtn = document.getElementById('addBtn');
     const sendBtn = document.getElementById('sendBtn');
     const copyBtn = document.getElementById('copyBtn');
+    const clearBtn = document.getElementById('clearBtn');
     const toast = document.getElementById('toast');
     const summary = document.getElementById('summary');
     const summaryCount = document.getElementById('summaryCount');
@@ -548,9 +577,11 @@
         summaryCount.textContent = `${count} ticket${count !== 1 ? 's' : ''} creado${count !== 1 ? 's' : ''}`;
         forms.querySelector('.empty-state')?.remove();
         copyBtn.style.display = 'inline-block';
+        clearBtn.style.display = 'inline-block';
       } else {
         summary.classList.remove('show');
         copyBtn.style.display = 'none';
+        clearBtn.style.display = 'none';
         if (!forms.querySelector('.empty-state')) {
           forms.innerHTML = `
             <div class="empty-state">
@@ -558,6 +589,44 @@
               <p>Haz clic en "Agregar ticket" para comenzar</p>
             </div>
           `;
+        }
+      }
+    }
+
+    function clearAllTickets() {
+      const tickets = Array.from(forms.children).filter(card => card.classList.contains('ticket-card'));
+      
+      if (tickets.length === 0) {
+        toastMsg('No hay tickets para eliminar', 2000, 'error');
+        return;
+      }
+      
+      // Confirmación antes de eliminar todo
+      const confirmMessage = `¿Estás seguro de que quieres eliminar todos los ${tickets.length} tickets?\n\nEsta acción no se puede deshacer.`;
+      
+      if (window.confirm(confirmMessage)) {
+        // Eliminar todos los tickets
+        tickets.forEach(ticket => ticket.remove());
+        
+        // Resetear contador
+        ticketCounter = 0;
+        
+        // Actualizar interfaz
+        updateSummary();
+        
+        toastMsg(`Se eliminaron ${tickets.length} tickets correctamente`, 2000, 'success');
+      }
+    }
+
+    function validateNumericInput(input) {
+      // Permitir solo números enteros
+      input.value = input.value.replace(/[^0-9]/g, '');
+      
+      // Validar que no esté vacío para campos requeridos
+      if (input.hasAttribute('required')) {
+        input.classList.remove('error');
+        if (input.value.trim()) {
+          input.style.borderColor = '#38a169';
         }
       }
     }
@@ -654,10 +723,10 @@
         minute: '2-digit'
       });
       
-      let message = `📋 *SOLICITUD DE TICKETS*\n`;
-      message += `📅 Fecha: ${currentDate}\n`;
-      message += `📊 Total de tickets: ${cards.length}\n\n`;
-      message += `━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+      let message = `SOLICITUD DE TICKETS\n`;
+      message += `Fecha: ${currentDate}\n`;
+      message += `Total de tickets: ${cards.length}\n\n`;
+      message += `=====================================\n\n`;
       
       cards.forEach((card, index) => {
         const ticketNum = index + 1;
@@ -667,24 +736,24 @@
           const tipo = card.querySelector('.tipo').value;
           const cantidad = card.querySelector('.cantidad').value;
           
-          message += `🏷️ *TICKET #${ticketNum} - IMPRESIÓN*\n`;
-          message += `• Código: \`${codigo}\`\n`;
-          message += `• Tipo: ${tipo}\n`;
-          message += `• Cantidad: ${cantidad} unidad${cantidad > 1 ? 'es' : ''}\n\n`;
+          message += `TICKET #${ticketNum} - IMPRESION\n`;
+          message += `- Codigo: ${codigo}\n`;
+          message += `- Tipo: ${tipo}\n`;
+          message += `- Cantidad: ${cantidad} unidad${cantidad > 1 ? 'es' : ''}\n\n`;
         } else {
           const id = card.querySelector('.idart').value.trim();
           const motivo = card.querySelector('.motivo').value;
           
-          message += `🔄 *TICKET #${ticketNum} - RE-IMPRESIÓN*\n`;
-          message += `• ID Artículo: \`${id}\`\n`;
-          message += `• Motivo: ${motivo}\n`;
-          message += `• Cantidad: 1 unidad\n\n`;
+          message += `TICKET #${ticketNum} - RE-IMPRESION\n`;
+          message += `- ID Articulo: ${id}\n`;
+          message += `- Motivo: ${motivo}\n`;
+          message += `- Cantidad: 1 unidad\n\n`;
         }
       });
       
-      message += `━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-      message += `⚡ *Procesamiento requerido*\n`;
-      message += `📱 Enviado desde Gestor de Tickets`;
+      message += `=====================================\n`;
+      message += `Procesamiento requerido\n`;
+      message += `Enviado desde Gestor de Tickets`;
       
       return message;
     }
@@ -716,13 +785,13 @@
       // Verificar que hay tickets
       const tickets = Array.from(forms.children).filter(card => card.classList.contains('ticket-card'));
       if (tickets.length === 0) {
-        toastMsg('❌ No hay tickets para enviar', 2000, 'error');
+        toastMsg('No hay tickets para enviar', 2000, 'error');
         return;
       }
       
       // Validar campos
       if (!validateAllFields()) {
-        toastMsg('❌ Por favor, completa todos los campos requeridos', 3000, 'error');
+        toastMsg('Por favor, completa todos los campos requeridos', 3000, 'error');
         return;
       }
       
@@ -731,7 +800,7 @@
       console.log('Mensaje construido:', message); // Debug
       
       if (!message) {
-        toastMsg('❌ Error al construir el mensaje', 2000, 'error');
+        toastMsg('Error al construir el mensaje', 2000, 'error');
         return;
       }
       
@@ -779,6 +848,14 @@
 
     // Validación en tiempo real
     forms.addEventListener('input', (e) => {
+      // Validación para campos numéricos (código, ID, cantidad)
+      if (e.target.classList.contains('codigo') || 
+          e.target.classList.contains('idart') || 
+          e.target.classList.contains('cantidad')) {
+        validateNumericInput(e.target);
+      }
+      
+      // Validación general para campos requeridos
       if (e.target.hasAttribute('required')) {
         e.target.classList.remove('error');
         if (e.target.value.trim()) {
@@ -787,10 +864,26 @@
       }
     });
 
+    // Prevenir pegado de texto no numérico
+    forms.addEventListener('paste', (e) => {
+      if (e.target.classList.contains('codigo') || 
+          e.target.classList.contains('idart') || 
+          e.target.classList.contains('cantidad')) {
+        
+        e.preventDefault();
+        const paste = (e.clipboardData || window.clipboardData).getData('text');
+        const numericValue = paste.replace(/[^0-9]/g, '');
+        e.target.value = numericValue;
+        validateNumericInput(e.target);
+      }
+    });
+
     btnImp.addEventListener('click', () => setMode('impresion'));
     btnReimp.addEventListener('click', () => setMode('reimpresion'));
     addBtn.addEventListener('click', addTicket);
     sendBtn.addEventListener('click', sendToWhatsApp);
+    copyBtn.addEventListener('click', copyMessageToClipboard);
+    clearBtn.addEventListener('click', clearAllTickets);
 
     // Atajos de teclado
     document.addEventListener('keydown', (e) => {
@@ -801,6 +894,10 @@
       if (e.ctrlKey && e.shiftKey && e.key === 'Enter') {
         e.preventDefault();
         sendToWhatsApp();
+      }
+      if (e.ctrlKey && e.shiftKey && e.key === 'Delete') {
+        e.preventDefault();
+        clearAllTickets();
       }
     });
 
