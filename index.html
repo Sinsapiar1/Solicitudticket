@@ -449,6 +449,7 @@
       
       <div class="actions">
         <button id="addBtn" class="secondary">➕ Agregar ticket</button>
+        <button id="copyBtn" class="secondary" style="display: none;">📋 Copiar mensaje</button>
         <button id="sendBtn" class="primary">📱 Enviar por WhatsApp</button>
       </div>
     </div>
@@ -520,6 +521,7 @@
     const btnReimp = document.getElementById('btnReimp');
     const addBtn = document.getElementById('addBtn');
     const sendBtn = document.getElementById('sendBtn');
+    const copyBtn = document.getElementById('copyBtn');
     const toast = document.getElementById('toast');
     const summary = document.getElementById('summary');
     const summaryCount = document.getElementById('summaryCount');
@@ -545,8 +547,10 @@
         summary.classList.add('show');
         summaryCount.textContent = `${count} ticket${count !== 1 ? 's' : ''} creado${count !== 1 ? 's' : ''}`;
         forms.querySelector('.empty-state')?.remove();
+        copyBtn.style.display = 'inline-block';
       } else {
         summary.classList.remove('show');
+        copyBtn.style.display = 'none';
         if (!forms.querySelector('.empty-state')) {
           forms.innerHTML = `
             <div class="empty-state">
@@ -556,9 +560,52 @@
           `;
         }
       }
+    }
+
+    function copyMessageToClipboard() {
+      const tickets = Array.from(forms.children).filter(card => card.classList.contains('ticket-card'));
+      if (tickets.length === 0) {
+        toastMsg('❌ No hay tickets para copiar', 2000, 'error');
+        return;
+      }
       
-      // Actualizar estado del botón enviar
-      sendBtn.disabled = count === 0;
+      if (!validateAllFields()) {
+        toastMsg('❌ Por favor, completa todos los campos requeridos', 3000, 'error');
+        return;
+      }
+      
+      const message = buildProfessionalMessage();
+      
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(message).then(() => {
+          toastMsg('📋 Mensaje copiado al portapapeles', 2000, 'success');
+        }).catch(err => {
+          console.error('Error al copiar:', err);
+          fallbackCopyTextToClipboard(message);
+        });
+      } else {
+        fallbackCopyTextToClipboard(message);
+      }
+    }
+
+    function fallbackCopyTextToClipboard(text) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.top = "0";
+      textArea.style.left = "0";
+      textArea.style.position = "fixed";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      
+      try {
+        document.execCommand('copy');
+        toastMsg('📋 Mensaje copiado al portapapeles', 2000, 'success');
+      } catch (err) {
+        toastMsg('❌ No se pudo copiar el mensaje', 2000, 'error');
+      }
+      
+      document.body.removeChild(textArea);
     }
 
     function setMode(m) {
@@ -659,56 +706,66 @@
       return isValid;
     }
 
-    function detectDevice() {
-      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-      
-      // Detectar dispositivos móviles
-      if (/android/i.test(userAgent)) {
-        return 'android';
-      }
-      if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-        return 'ios';
-      }
-      
-      // Detectar WhatsApp Desktop
-      if (navigator.platform.indexOf('Win') !== -1 || navigator.platform.indexOf('Mac') !== -1 || navigator.platform.indexOf('Linux') !== -1) {
-        return 'desktop';
-      }
-      
-      return 'mobile';
+    function isMobileDevice() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     }
 
     function sendToWhatsApp() {
+      console.log('Botón de WhatsApp clickeado'); // Debug
+      
+      // Verificar que hay tickets
+      const tickets = Array.from(forms.children).filter(card => card.classList.contains('ticket-card'));
+      if (tickets.length === 0) {
+        toastMsg('❌ No hay tickets para enviar', 2000, 'error');
+        return;
+      }
+      
+      // Validar campos
       if (!validateAllFields()) {
         toastMsg('❌ Por favor, completa todos los campos requeridos', 3000, 'error');
         return;
       }
       
+      // Construir mensaje
       const message = buildProfessionalMessage();
+      console.log('Mensaje construido:', message); // Debug
+      
       if (!message) {
-        toastMsg('❌ No hay tickets para enviar', 2000, 'error');
+        toastMsg('❌ Error al construir el mensaje', 2000, 'error');
         return;
       }
       
-      const device = detectDevice();
-      let whatsappUrl;
+      // Crear URL de WhatsApp - versión simplificada y más compatible
+      const encodedMessage = encodeURIComponent(message);
+      const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
       
-      if (device === 'desktop') {
-        // Para escritorio - abre WhatsApp Web
-        whatsappUrl = `https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`;
-      } else {
-        // Para móviles - abre la app nativa
-        whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
-      }
+      console.log('URL de WhatsApp:', whatsappUrl); // Debug
       
+      // Intentar abrir WhatsApp
       try {
-        window.open(whatsappUrl, '_blank');
+        // Método más directo y compatible
+        if (isMobileDevice()) {
+          // En móviles, intenta abrir la app directamente
+          window.location.href = whatsappUrl;
+        } else {
+          // En escritorio, abre en nueva pestaña
+          const newWindow = window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+          if (!newWindow) {
+            // Si el popup fue bloqueado, intenta con location
+            window.location.href = whatsappUrl;
+          }
+        }
         toastMsg('✅ Abriendo WhatsApp...', 2000, 'success');
       } catch (error) {
-        // Fallback para compatibilidad
-        const fallbackUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
-        window.open(fallbackUrl, '_blank');
-        toastMsg('✅ Abriendo WhatsApp...', 2000, 'success');
+        console.error('Error al abrir WhatsApp:', error);
+        toastMsg('❌ Error al abrir WhatsApp. Intenta copiar el mensaje manualmente.', 4000, 'error');
+        
+        // Como última opción, copiar al portapapeles
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(message).then(() => {
+            toastMsg('📋 Mensaje copiado al portapapeles', 3000, 'success');
+          });
+        }
       }
     }
 
