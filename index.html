@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gestor de Tickets · WhatsApp</title>
+  <style>
+    /* Variables de color */
+    :root {
+      --white: #ffffff;
+      --red: #e53e3e;
+      --red-dark: #9b2c2c;
+      --gray: #f7fafc;
+      --gray-light: #edf2f7;
+      --gray-dark: #4a5568;
+      --text: #2d3748;
+      --text-light: #718096;
+      --accent: #feb2b2;
+      --success: #38a169;
+      --border: #e2e8f0;
+      --shadow: rgba(0, 0, 0, 0.1);
+    }
+    
+    *, *::before, *::after { 
+      box-sizing: border-box; 
+    }
+    
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, var(--gray) 0%, var(--gray-light) 100%);
+      color: var(--text);
+      padding: 16px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 900px;
+      background: var(--white);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px var(--shadow);
+      display: flex;
+      flex-direction: column;
+      min-height: 600px;
+    }
+    
+    header {
+      background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+      color: var(--white);
+      padding: 24px;
+      text-align: center;
+      position: relative;
+    }
+    
+    header::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-top: 10px solid var(--red-dark);
+    }
+    
+    header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+    }
+    
+    .subtitle {
+      margin: 8px 0 0 0;
+      font-size: 0.9rem;
+      opacity: 0.9;
+      font-weight: 300;
+    }
+    
+    .toggle {
+      display: flex;
+      margin: 24px 24px 0 24px;
+      background: var(--gray-light);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .toggle button {
+      flex: 1;
+      padding: 12px 16px;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      background: transparent;
+      color: var(--gray-dark);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+    
+    .toggle button[aria-pressed="true"] {
+      background: var(--red);
+      color: var(--white);
+      box-shadow: 0 2px 8px rgba(229, 62, 62, 0.3);
+    }
+    
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+      gap: 20px;
+    }
+    
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-height: 200px;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-light);
+      background: var(--gray-light);
+      border-radius: 8px;
+      border: 2px dashed var(--border);
+    }
+    
+    .empty-state h3 {
+      margin: 0 0 8px 0;
+      font-size: 1.1rem;
+      color: var(--gray-dark);
+    }
+    
+    .ticket-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    
+    .ticket-card:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      border-color: var(--red);
+    }
+    
+    .ticket-card .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--red-dark);
+      font-weight: 600;
+      font-size: 1.1rem;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .ticket-card .header .badge {
+      background: var(--red);
+      color: var(--white);
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-weight: 500;
+    }
+    
+    .ticket-card .fields {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    
+    .field label {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--gray-dark);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .field label .required {
+      color: var(--red);
+      font-size: 0.8rem;
+    }
+    
+    .field input, .field select {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      background: var(--white);
+    }
+    
+    .field input:focus, .field select:focus {
+      outline: none;
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+    }
+    
+    .field input.error {
+      border-color: #c53030;
+      background: #fed7d7;
+    }
+    
+    .field input:disabled {
+      background: var(--gray-light);
+      color: var(--text-light);
+      cursor: not-allowed;
+    }
+    
+    .remove-btn {
+      background: none;
+      border: none;
+      color: var(--text-light);
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+    
+    .remove-btn:hover {
+      background: #fed7d7;
+      color: #c53030;
+    }
+    
+    .actions {
+      display: flex;
+      gap: 12px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    
+    .actions button {
+      flex: 1;
+      padding: 14px 20px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .actions button.secondary {
+      background: var(--gray-light);
+      color: var(--gray-dark);
+      border: 1px solid var(--border);
+    }
+    
+    .actions button.secondary:hover {
+      background: var(--gray-dark);
+      color: var(--white);
+    }
+    
+    .actions button.primary {
+      background: var(--red);
+      color: var(--white);
+      box-shadow: 0 2px 8px rgba(229, 62, 62, 0.3);
+    }
+    
+    .actions button.primary:hover {
+      background: var(--red-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(229, 62, 62, 0.4);
+    }
+    
+    .actions button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+    
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--red-dark);
+      color: var(--white);
+      padding: 12px 20px;
+      border-radius: 8px;
+      display: none;
+      opacity: 0;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      z-index: 1000;
+      transition: opacity 0.3s ease;
+      max-width: 90vw;
+      text-align: center;
+    }
+    
+    .toast.show {
+      display: block;
+      opacity: 1;
+    }
+    
+    .summary {
+      background: var(--gray-light);
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 8px;
+      display: none;
+    }
+    
+    .summary.show {
+      display: block;
+    }
+    
+    .summary h4 {
+      margin: 0 0 8px 0;
+      color: var(--gray-dark);
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    
+    .summary-count {
+      font-size: 0.9rem;
+      color: var(--text-light);
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      body {
+        padding: 8px;
+      }
+      
+      .container {
+        border-radius: 8px;
+        min-height: auto;
+      }
+      
+      header {
+        padding: 20px 16px;
+      }
+      
+      header h1 {
+        font-size: 1.5rem;
+      }
+      
+      .content {
+        padding: 16px;
+        gap: 16px;
+      }
+      
+      .toggle {
+        margin: 16px 16px 0 16px;
+      }
+      
+      .toggle button {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+      }
+      
+      .ticket-card {
+        padding: 16px;
+      }
+      
+      .ticket-card .fields {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      
+      .actions {
+        flex-direction: column;
+        gap: 8px;
+      }
+      
+      .actions button {
+        padding: 12px 16px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      header h1 {
+        font-size: 1.3rem;
+      }
+      
+      .content {
+        padding: 12px;
+      }
+      
+      .toggle {
+        margin: 12px 12px 0 12px;
+      }
+      
+      .ticket-card {
+        padding: 12px;
+      }
+      
+      .ticket-card .header {
+        font-size: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Gestor de Tickets</h1>
+      <p class="subtitle">Sistema profesional para gestión de impresiones</p>
+    </header>
+    
+    <div class="toggle" role="group" aria-label="Seleccionar tipo de ticket">
+      <button id="btnImp" aria-pressed="true" data-mode="impresion">📄 Impresión</button>
+      <button id="btnReimp" aria-pressed="false" data-mode="reimpresion">🔄 Re-impresión</button>
+    </div>
+    
+    <div class="content">
+      <div class="stack" id="forms">
+        <div class="empty-state">
+          <h3>No hay tickets creados</h3>
+          <p>Haz clic en "Agregar ticket" para comenzar</p>
+        </div>
+      </div>
+      
+      <div class="summary" id="summary">
+        <h4>Resumen</h4>
+        <div class="summary-count" id="summaryCount">0 tickets creados</div>
+      </div>
+      
+      <div class="actions">
+        <button id="addBtn" class="secondary">➕ Agregar ticket</button>
+        <button id="sendBtn" class="primary">📱 Enviar por WhatsApp</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="toast" id="toast"></div>
+
+  <!-- Templates -->
+  <template id="tplImp">
+    <div class="ticket-card" data-kind="impresion">
+      <div class="header">
+        <span>Ticket de Impresión <span class="badge" id="ticketNumber"></span></span>
+        <button class="remove-btn" data-action="remove">🗑️ Eliminar</button>
+      </div>
+      <div class="fields">
+        <div class="field">
+          <label>Código de Artículo <span class="required">*</span></label>
+          <input type="text" class="codigo" placeholder="Ej: ABC123" required autocomplete="off">
+        </div>
+        <div class="field">
+          <label>Tipo de Artículo</label>
+          <select class="tipo">
+            <option value="Usado">📦 Usado</option>
+            <option value="Reparación">🔧 Reparación</option>
+            <option value="Nuevo">✨ Nuevo</option>
+            <option value="Refurbished">♻️ Refurbished</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Cantidad <span class="required">*</span></label>
+          <input type="number" class="cantidad" min="1" max="999" value="1" required>
+        </div>
+      </div>
+    </div>
+  </template>
+  
+  <template id="tplReimp">
+    <div class="ticket-card" data-kind="reimpresion">
+      <div class="header">
+        <span>Ticket de Re-impresión <span class="badge" id="ticketNumber"></span></span>
+        <button class="remove-btn" data-action="remove">🗑️ Eliminar</button>
+      </div>
+      <div class="fields">
+        <div class="field">
+          <label>ID de Artículo <span class="required">*</span></label>
+          <input type="text" class="idart" placeholder="Ej: 987654" required autocomplete="off">
+        </div>
+        <div class="field">
+          <label>Motivo de Re-impresión</label>
+          <select class="motivo">
+            <option value="Etiqueta dañada">🏷️ Etiqueta dañada</option>
+            <option value="Error en datos">❌ Error en datos</option>
+            <option value="Pérdida de etiqueta">📋 Pérdida de etiqueta</option>
+            <option value="Solicitud cliente">👤 Solicitud cliente</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Cantidad</label>
+          <input type="number" class="cantidad" disabled value="1" readonly>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    // Elementos DOM
+    const forms = document.getElementById('forms');
+    const btnImp = document.getElementById('btnImp');
+    const btnReimp = document.getElementById('btnReimp');
+    const addBtn = document.getElementById('addBtn');
+    const sendBtn = document.getElementById('sendBtn');
+    const toast = document.getElementById('toast');
+    const summary = document.getElementById('summary');
+    const summaryCount = document.getElementById('summaryCount');
+    const tplImp = document.getElementById('tplImp');
+    const tplReimp = document.getElementById('tplReimp');
+    
+    let mode = 'impresion';
+    let ticketCounter = 0;
+
+    // Funciones utilitarias
+    function toastMsg(msg, duration = 3000, type = 'info') {
+      toast.textContent = msg;
+      toast.className = `toast show ${type}`;
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.style.display = 'none', 300);
+      }, duration);
+    }
+
+    function updateSummary() {
+      const count = forms.children.length - (forms.querySelector('.empty-state') ? 1 : 0);
+      if (count > 0) {
+        summary.classList.add('show');
+        summaryCount.textContent = `${count} ticket${count !== 1 ? 's' : ''} creado${count !== 1 ? 's' : ''}`;
+        forms.querySelector('.empty-state')?.remove();
+      } else {
+        summary.classList.remove('show');
+        if (!forms.querySelector('.empty-state')) {
+          forms.innerHTML = `
+            <div class="empty-state">
+              <h3>No hay tickets creados</h3>
+              <p>Haz clic en "Agregar ticket" para comenzar</p>
+            </div>
+          `;
+        }
+      }
+      
+      // Actualizar estado del botón enviar
+      sendBtn.disabled = count === 0;
+    }
+
+    function setMode(m) {
+      mode = m;
+      btnImp.setAttribute('aria-pressed', m === 'impresion');
+      btnReimp.setAttribute('aria-pressed', m === 'reimpresion');
+    }
+
+    function addTicket() {
+      const tpl = mode === 'impresion' ? tplImp : tplReimp;
+      const clone = tpl.content.firstElementChild.cloneNode(true);
+      
+      ticketCounter++;
+      const badge = clone.querySelector('#ticketNumber');
+      badge.textContent = `#${ticketCounter}`;
+      badge.id = `ticket-${ticketCounter}`;
+      
+      forms.appendChild(clone);
+      updateSummary();
+      
+      // Enfocar el primer campo del nuevo ticket
+      const firstInput = clone.querySelector('input[required]');
+      if (firstInput) {
+        setTimeout(() => firstInput.focus(), 100);
+      }
+      
+      toastMsg(`Ticket #${ticketCounter} agregado correctamente`, 2000, 'success');
+    }
+
+    function removeTicket(card) {
+      const ticketNumber = card.querySelector('.badge').textContent;
+      card.remove();
+      updateSummary();
+      toastMsg(`Ticket ${ticketNumber} eliminado`, 2000);
+    }
+
+    function buildProfessionalMessage() {
+      const cards = Array.from(forms.children).filter(card => card.classList.contains('ticket-card'));
+      if (!cards.length) return '';
+      
+      const currentDate = new Date().toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      
+      let message = `📋 *SOLICITUD DE TICKETS*\n`;
+      message += `📅 Fecha: ${currentDate}\n`;
+      message += `📊 Total de tickets: ${cards.length}\n\n`;
+      message += `━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+      
+      cards.forEach((card, index) => {
+        const ticketNum = index + 1;
+        
+        if (card.dataset.kind === 'impresion') {
+          const codigo = card.querySelector('.codigo').value.trim();
+          const tipo = card.querySelector('.tipo').value;
+          const cantidad = card.querySelector('.cantidad').value;
+          
+          message += `🏷️ *TICKET #${ticketNum} - IMPRESIÓN*\n`;
+          message += `• Código: \`${codigo}\`\n`;
+          message += `• Tipo: ${tipo}\n`;
+          message += `• Cantidad: ${cantidad} unidad${cantidad > 1 ? 'es' : ''}\n\n`;
+        } else {
+          const id = card.querySelector('.idart').value.trim();
+          const motivo = card.querySelector('.motivo').value;
+          
+          message += `🔄 *TICKET #${ticketNum} - RE-IMPRESIÓN*\n`;
+          message += `• ID Artículo: \`${id}\`\n`;
+          message += `• Motivo: ${motivo}\n`;
+          message += `• Cantidad: 1 unidad\n\n`;
+        }
+      });
+      
+      message += `━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+      message += `⚡ *Procesamiento requerido*\n`;
+      message += `📱 Enviado desde Gestor de Tickets`;
+      
+      return message;
+    }
+
+    function validateAllFields() {
+      let isValid = true;
+      const cards = Array.from(forms.children).filter(card => card.classList.contains('ticket-card'));
+      
+      cards.forEach(card => {
+        card.querySelectorAll('input[required]').forEach(input => {
+          input.classList.remove('error');
+          if (!input.value.trim()) {
+            input.classList.add('error');
+            isValid = false;
+          }
+        });
+      });
+      
+      return isValid;
+    }
+
+    function detectDevice() {
+      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+      
+      // Detectar dispositivos móviles
+      if (/android/i.test(userAgent)) {
+        return 'android';
+      }
+      if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+        return 'ios';
+      }
+      
+      // Detectar WhatsApp Desktop
+      if (navigator.platform.indexOf('Win') !== -1 || navigator.platform.indexOf('Mac') !== -1 || navigator.platform.indexOf('Linux') !== -1) {
+        return 'desktop';
+      }
+      
+      return 'mobile';
+    }
+
+    function sendToWhatsApp() {
+      if (!validateAllFields()) {
+        toastMsg('❌ Por favor, completa todos los campos requeridos', 3000, 'error');
+        return;
+      }
+      
+      const message = buildProfessionalMessage();
+      if (!message) {
+        toastMsg('❌ No hay tickets para enviar', 2000, 'error');
+        return;
+      }
+      
+      const device = detectDevice();
+      let whatsappUrl;
+      
+      if (device === 'desktop') {
+        // Para escritorio - abre WhatsApp Web
+        whatsappUrl = `https://web.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+      } else {
+        // Para móviles - abre la app nativa
+        whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+      }
+      
+      try {
+        window.open(whatsappUrl, '_blank');
+        toastMsg('✅ Abriendo WhatsApp...', 2000, 'success');
+      } catch (error) {
+        // Fallback para compatibilidad
+        const fallbackUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+        window.open(fallbackUrl, '_blank');
+        toastMsg('✅ Abriendo WhatsApp...', 2000, 'success');
+      }
+    }
+
+    // Event Listeners
+    forms.addEventListener('click', (e) => {
+      if (e.target.dataset.action === 'remove' || e.target.closest('[data-action="remove"]')) {
+        const card = e.target.closest('.ticket-card');
+        if (card) removeTicket(card);
+      }
+    });
+
+    // Validación en tiempo real
+    forms.addEventListener('input', (e) => {
+      if (e.target.hasAttribute('required')) {
+        e.target.classList.remove('error');
+        if (e.target.value.trim()) {
+          e.target.style.borderColor = '#38a169';
+        }
+      }
+    });
+
+    btnImp.addEventListener('click', () => setMode('impresion'));
+    btnReimp.addEventListener('click', () => setMode('reimpresion'));
+    addBtn.addEventListener('click', addTicket);
+    sendBtn.addEventListener('click', sendToWhatsApp);
+
+    // Atajos de teclado
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === 'Enter') {
+        e.preventDefault();
+        addTicket();
+      }
+      if (e.ctrlKey && e.shiftKey && e.key === 'Enter') {
+        e.preventDefault();
+        sendToWhatsApp();
+      }
+    });
+
+    // Inicialización
+    updateSummary();
+    
+    // Agregar primer ticket automáticamente
+    setTimeout(() => {
+      addTicket();
+    }, 500);
+  </script>
+</body>
+</html>
