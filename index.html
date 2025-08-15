@@ -188,7 +188,7 @@
     
     .ticket-card .fields {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 16px;
     }
     
@@ -236,6 +236,42 @@
       background: var(--gray-light);
       color: var(--text-light);
       cursor: not-allowed;
+    }
+    
+    .field input[readonly] {
+      background: var(--gray-light);
+      color: var(--gray-dark);
+      cursor: default;
+      border-color: var(--border);
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      white-space: normal;
+      line-height: 1.3;
+    }
+    
+    .field input[readonly]:focus {
+      border-color: var(--border);
+      box-shadow: none;
+    }
+    
+    /* Campo específico para nombre del artículo */
+    .nombre-articulo {
+      min-height: 2.5rem !important;
+      resize: vertical;
+      overflow: auto;
+      font-size: 0.9rem !important;
+      padding: 8px 12px !important;
+    }
+    
+    /* En pantallas grandes, el nombre del artículo ocupa más espacio */
+    @media (min-width: 768px) {
+      .ticket-card .fields {
+        grid-template-columns: 1fr 2fr 1fr 1fr;
+      }
+      
+      .field:nth-child(2) {
+        grid-column: span 1;
+      }
     }
     
     .remove-btn {
@@ -289,6 +325,12 @@
       background: var(--red);
       color: var(--white);
       box-shadow: 0 2px 8px rgba(229, 62, 62, 0.3);
+    }
+    
+    .actions button.primary:hover {
+      background: var(--red-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(229, 62, 62, 0.4);
     }
     
     .actions button.danger {
@@ -394,8 +436,13 @@
       }
       
       .ticket-card .fields {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
         gap: 12px;
+      }
+      
+      /* En móviles, el nombre del artículo ocupa toda la fila */
+      .field:has(.nombre-articulo) {
+        grid-column: 1 / -1;
       }
       
       .actions {
@@ -447,6 +494,10 @@
       .shortcuts {
         display: none;
       }
+      
+      .ticket-card .fields {
+        grid-template-columns: 1fr !important;
+      }
     }
   </style>
 </head>
@@ -474,6 +525,10 @@
       <div class="summary" id="summary">
         <h4>Resumen</h4>
         <div class="summary-count" id="summaryCount">0 tickets creados</div>
+        <div style="margin-top: 8px;">
+          <small id="dbStatus" style="color: #718096;">Base de datos: No cargada</small>
+          <button id="reloadDB" style="display: none; margin-left: 8px; padding: 2px 6px; font-size: 0.7rem; background: #e53e3e; color: white; border: none; border-radius: 3px; cursor: pointer;">Recargar BD</button>
+        </div>
       </div>
       
       <div class="actions">
@@ -498,6 +553,10 @@
         <div class="field">
           <label>Código de Artículo <span class="required">*</span></label>
           <input type="text" class="codigo" placeholder="Solo números: 123456" required autocomplete="off" pattern="[0-9]*" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label>Nombre del Artículo</label>
+          <input type="text" class="nombre-articulo" placeholder="Se cargará automáticamente..." readonly style="background: #f7fafc; color: #4a5568;">
         </div>
         <div class="field">
           <label>Tipo de Artículo</label>
@@ -554,11 +613,233 @@
     const toast = document.getElementById('toast');
     const summary = document.getElementById('summary');
     const summaryCount = document.getElementById('summaryCount');
+    const dbStatus = document.getElementById('dbStatus');
+    const reloadDB = document.getElementById('reloadDB');
     const tplImp = document.getElementById('tplImp');
     const tplReimp = document.getElementById('tplReimp');
     
+    // Variables globales
     let mode = 'impresion';
     let ticketCounter = 0;
+    
+    // Base de datos de artículos
+    let articulosDB = new Map();
+    let isLoadingArticulos = false;
+    let articulosLoaded = false;
+
+    // Cargar base de datos de artículos desde Google Sheets
+    async function loadArticulosDB() {
+      if (articulosLoaded || isLoadingArticulos) return;
+      
+      isLoadingArticulos = true;
+      toastMsg('Cargando base de datos de artículos...', 1000);
+      
+      // Actualizar estado en la interfaz
+      dbStatus.textContent = 'Base de datos: Cargando...';
+      dbStatus.style.color = '#718096';
+      reloadDB.style.display = 'none';
+      
+      try {
+        // URL de tu Google Sheets en formato CSV
+        const sheetUrl = 'https://docs.google.com/spreadsheets/d/1M8blOHHzoaBSacXtyIEfouvacWedb2m2/export?format=csv&gid=3478202';
+        
+        const response = await fetch(sheetUrl);
+        
+        if (!response.ok) {
+          throw new Error(`Error HTTP: ${response.status}. Verifica que la hoja sea pública.`);
+        }
+        
+        const csvText = await response.text();
+        
+        if (!csvText || csvText.trim().length === 0) {
+          throw new Error('La hoja está vacía o no se pudo leer');
+        }
+        
+        // Parsear CSV
+        const lines = csvText.split('\n').filter(line => line.trim());
+        
+        if (lines.length < 2) {
+          throw new Error('La hoja debe tener al menos una fila de encabezados y una de datos');
+        }
+        
+        // Parsear encabezados de forma más robusta
+        const rawHeaders = lines[0].split(',');
+        const headers = rawHeaders.map(h => h.trim().replace(/"/g, ''));
+        console.log('Encabezados EXACTOS encontrados:', headers);
+        
+        // Encontrar columnas de código y nombre - BÚSQUEDA EXACTA
+        let codigoIndex = -1;
+        let nombreIndex = -1;
+        
+        // Buscar código (primera columna generalmente)
+        for (let i = 0; i < headers.length; i++) {
+          const header = headers[i].toLowerCase();
+          if (header.includes('codigo') || header.includes('código') || header.includes('id') || header.includes('sku')) {
+            codigoIndex = i;
+            break;
+          }
+        }
+        
+        // Buscar "Nombre del producto" EXACTO
+        for (let i = 0; i < headers.length; i++) {
+          const header = headers[i];
+          console.log(`Comparando header ${i}: "${header}"`);
+          if (header === 'Nombre del producto' || 
+              header === 'NOMBRE DEL PRODUCTO' ||
+              header.toLowerCase() === 'nombre del producto') {
+            nombreIndex = i;
+            console.log(`¡ENCONTRADO! Índice nombre: ${i}`);
+            break;
+          }
+        }
+        
+        // Si no encuentra "Nombre del producto", buscar alternativas
+        if (nombreIndex === -1) {
+          for (let i = 0; i < headers.length; i++) {
+            const header = headers[i].toLowerCase();
+            if (header.includes('nombre') || header.includes('descripcion') || header.includes('producto')) {
+              nombreIndex = i;
+              console.log(`Usando header alternativo: ${headers[i]} en índice ${i}`);
+              break;
+            }
+          }
+        }
+        
+        console.log(`RESULTADO: Código índice: ${codigoIndex}, Nombre índice: ${nombreIndex}`);
+        
+        if (codigoIndex === -1 || nombreIndex === -1) {
+          console.error('Columnas disponibles:', headers);
+          console.error(`No se encontró código: ${codigoIndex === -1}, No se encontró nombre: ${nombreIndex === -1}`);
+          throw new Error(`COLUMNAS NO ENCONTRADAS:
+                          - Columnas disponibles: ${headers.join(' | ')}
+                          - Buscando columna de código: ${codigoIndex === -1 ? 'NO ENCONTRADA' : 'ENCONTRADA'}
+                          - Buscando "Nombre del producto": ${nombreIndex === -1 ? 'NO ENCONTRADA' : 'ENCONTRADA'}`);
+        }
+        
+        // Procesar datos - MEJORADO para manejar comillas
+        let articulosCargados = 0;
+        for (let i = 1; i < lines.length; i++) {
+          if (lines[i].trim()) {
+            // Parsear CSV más robusto
+            const cols = [];
+            let current = '';
+            let inQuotes = false;
+            const line = lines[i];
+            
+            for (let j = 0; j < line.length; j++) {
+              const char = line[j];
+              if (char === '"') {
+                inQuotes = !inQuotes;
+              } else if (char === ',' && !inQuotes) {
+                cols.push(current.trim());
+                current = '';
+              } else {
+                current += char;
+              }
+            }
+            cols.push(current.trim()); // Último elemento
+            
+            const codigo = cols[codigoIndex]?.toString().trim().replace(/"/g, '');
+            const nombre = cols[nombreIndex]?.toString().trim().replace(/"/g, '');
+            
+            if (i <= 3) { // Solo mostrar las primeras 3 filas para debug
+              console.log(`Fila ${i}: Código="${codigo}", Nombre="${nombre}"`);
+            }
+            
+            if (codigo && nombre && codigo !== '' && nombre !== '') {
+              articulosDB.set(codigo, nombre);
+              articulosCargados++;
+            }
+          }
+        }
+        
+        if (articulosCargados === 0) {
+          throw new Error('No se encontraron artículos válidos en la hoja');
+        }
+        
+        articulosLoaded = true;
+        toastMsg(`Base de datos cargada: ${articulosCargados} artículos`, 2000, 'success');
+        console.log(`=== RESUMEN DE CARGA ===`);
+        console.log(`Artículos cargados: ${articulosCargados}`);
+        console.log(`Columna código (índice ${codigoIndex}): ${headers[codigoIndex]}`);
+        console.log(`Columna nombre (índice ${nombreIndex}): ${headers[nombreIndex]}`);
+        console.log('Primeros 5 artículos cargados:');
+        Array.from(articulosDB.entries()).slice(0, 5).forEach(([codigo, nombre]) => {
+          console.log(`  ${codigo} -> ${nombre}`);
+        });
+        console.log(`========================`);
+        
+        // Actualizar estado en la interfaz
+        dbStatus.textContent = `Base de datos: ${articulosCargados} artículos cargados`;
+        dbStatus.style.color = '#38a169';
+        reloadDB.style.display = 'none';
+        
+      } catch (error) {
+        console.error('Error cargando artículos:', error);
+        
+        let errorMessage = 'Error al cargar base de datos. ';
+        if (error.message.includes('403') || error.message.includes('401')) {
+          errorMessage += 'Verifica que la hoja de Google Sheets sea pública.';
+        } else if (error.message.includes('CORS')) {
+          errorMessage += 'Problema de CORS. Verifica la configuración de la hoja.';
+        } else {
+          errorMessage += error.message;
+        }
+        
+        toastMsg(errorMessage, 5000);
+        articulosLoaded = false;
+        
+        // Actualizar estado en la interfaz
+        dbStatus.textContent = 'Base de datos: Error al cargar';
+        dbStatus.style.color = '#e53e3e';
+        reloadDB.style.display = 'inline-block';
+      }
+      
+      isLoadingArticulos = false;
+    }
+
+    // Función para recargar la base de datos manualmente
+    function reloadArticulosDB() {
+      articulosLoaded = false;
+      articulosDB.clear();
+      loadArticulosDB();
+    }
+
+    // Buscar nombre de artículo por código
+    function getNombreArticulo(codigo) {
+      if (!codigo || !articulosLoaded) {
+        console.log('Base de datos no cargada o código vacío');
+        return '';
+      }
+      
+      const codigoStr = codigo.toString().trim();
+      console.log(`Buscando código: "${codigoStr}"`);
+      console.log(`Base de datos tiene ${articulosDB.size} artículos`);
+      
+      // Búsqueda exacta
+      if (articulosDB.has(codigoStr)) {
+        const nombre = articulosDB.get(codigoStr);
+        console.log(`ENCONTRADO exacto: ${codigoStr} -> ${nombre}`);
+        return nombre;
+      }
+      
+      // Búsqueda flexible (sin ceros a la izquierda, etc.)
+      const codigoNum = parseInt(codigoStr, 10);
+      if (!isNaN(codigoNum)) {
+        for (let [key, value] of articulosDB) {
+          if (parseInt(key, 10) === codigoNum) {
+            console.log(`ENCONTRADO flexible: ${codigoStr} -> ${value} (clave: ${key})`);
+            return value;
+          }
+        }
+      }
+      
+      // Mostrar algunos ejemplos de la base de datos
+      const ejemplos = Array.from(articulosDB.entries()).slice(0, 3);
+      console.log(`NO ENCONTRADO. Ejemplos en BD:`, ejemplos);
+      
+      return 'Desconocido';
+    }
 
     // Funciones utilitarias
     function toastMsg(msg, duration = 3000, type = 'info') {
@@ -622,6 +903,53 @@
       // Permitir solo números enteros
       input.value = input.value.replace(/[^0-9]/g, '');
       
+      // Si es un campo de código, buscar el nombre del artículo
+      if (input.classList.contains('codigo')) {
+        const nombreField = input.closest('.ticket-card').querySelector('.nombre-articulo');
+        if (nombreField) {
+          const codigo = input.value.trim();
+          if (codigo) {
+            if (articulosLoaded) {
+              const nombre = getNombreArticulo(codigo);
+              nombreField.value = nombre;
+              
+              // Cambiar estilo según si se encontró o no
+              if (nombre === 'Desconocido') {
+                nombreField.style.color = '#e53e3e';
+                nombreField.style.fontStyle = 'italic';
+              } else {
+                nombreField.style.color = '#38a169';
+                nombreField.style.fontStyle = 'normal';
+              }
+            } else {
+              nombreField.value = 'Cargando base de datos...';
+              nombreField.style.color = '#718096';
+              nombreField.style.fontStyle = 'italic';
+              
+              // Intentar cargar la base de datos si no está cargada
+              loadArticulosDB().then(() => {
+                if (articulosLoaded && input.value.trim()) {
+                  const nombre = getNombreArticulo(input.value.trim());
+                  nombreField.value = nombre;
+                  
+                  if (nombre === 'Desconocido') {
+                    nombreField.style.color = '#e53e3e';
+                    nombreField.style.fontStyle = 'italic';
+                  } else {
+                    nombreField.style.color = '#38a169';
+                    nombreField.style.fontStyle = 'normal';
+                  }
+                }
+              });
+            }
+          } else {
+            nombreField.value = '';
+            nombreField.style.color = '#4a5568';
+            nombreField.style.fontStyle = 'normal';
+          }
+        }
+      }
+      
       // Validar que no esté vacío para campos requeridos
       if (input.hasAttribute('required')) {
         input.classList.remove('error');
@@ -634,12 +962,12 @@
     function copyMessageToClipboard() {
       const tickets = Array.from(forms.children).filter(card => card.classList.contains('ticket-card'));
       if (tickets.length === 0) {
-        toastMsg('❌ No hay tickets para copiar', 2000, 'error');
+        toastMsg('No hay tickets para copiar', 2000, 'error');
         return;
       }
       
       if (!validateAllFields()) {
-        toastMsg('❌ Por favor, completa todos los campos requeridos', 3000, 'error');
+        toastMsg('Por favor, completa todos los campos requeridos', 3000, 'error');
         return;
       }
       
@@ -647,7 +975,7 @@
       
       if (navigator.clipboard) {
         navigator.clipboard.writeText(message).then(() => {
-          toastMsg('📋 Mensaje copiado al portapapeles', 2000, 'success');
+          toastMsg('Mensaje copiado al portapapeles', 2000, 'success');
         }).catch(err => {
           console.error('Error al copiar:', err);
           fallbackCopyTextToClipboard(message);
@@ -669,9 +997,9 @@
       
       try {
         document.execCommand('copy');
-        toastMsg('📋 Mensaje copiado al portapapeles', 2000, 'success');
+        toastMsg('Mensaje copiado al portapapeles', 2000, 'success');
       } catch (err) {
-        toastMsg('❌ No se pudo copiar el mensaje', 2000, 'error');
+        toastMsg('No se pudo copiar el mensaje', 2000, 'error');
       }
       
       document.body.removeChild(textArea);
@@ -681,6 +1009,11 @@
       mode = m;
       btnImp.setAttribute('aria-pressed', m === 'impresion');
       btnReimp.setAttribute('aria-pressed', m === 'reimpresion');
+      
+      // Cargar base de datos si se selecciona impresión
+      if (m === 'impresion' && !articulosLoaded && !isLoadingArticulos) {
+        loadArticulosDB();
+      }
     }
 
     function addTicket() {
@@ -694,6 +1027,11 @@
       
       forms.appendChild(clone);
       updateSummary();
+      
+      // Cargar base de datos si es ticket de impresión y no está cargada
+      if (mode === 'impresion' && !articulosLoaded && !isLoadingArticulos) {
+        loadArticulosDB();
+      }
       
       // Enfocar el primer campo del nuevo ticket
       const firstInput = clone.querySelector('input[required]');
@@ -733,11 +1071,15 @@
         
         if (card.dataset.kind === 'impresion') {
           const codigo = card.querySelector('.codigo').value.trim();
+          const nombre = card.querySelector('.nombre-articulo').value.trim();
           const tipo = card.querySelector('.tipo').value;
           const cantidad = card.querySelector('.cantidad').value;
           
           message += `TICKET #${ticketNum} - IMPRESION\n`;
           message += `- Codigo: ${codigo}\n`;
+          if (nombre && nombre !== 'Cargando base de datos...' && nombre !== 'Se cargará automáticamente...') {
+            message += `- Nombre: ${nombre}\n`;
+          }
           message += `- Tipo: ${tipo}\n`;
           message += `- Cantidad: ${cantidad} unidad${cantidad > 1 ? 'es' : ''}\n\n`;
         } else {
@@ -824,15 +1166,15 @@
             window.location.href = whatsappUrl;
           }
         }
-        toastMsg('✅ Abriendo WhatsApp...', 2000, 'success');
+        toastMsg('Abriendo WhatsApp...', 2000, 'success');
       } catch (error) {
         console.error('Error al abrir WhatsApp:', error);
-        toastMsg('❌ Error al abrir WhatsApp. Intenta copiar el mensaje manualmente.', 4000, 'error');
+        toastMsg('Error al abrir WhatsApp. Intenta copiar el mensaje manualmente.', 4000, 'error');
         
         // Como última opción, copiar al portapapeles
         if (navigator.clipboard) {
           navigator.clipboard.writeText(message).then(() => {
-            toastMsg('📋 Mensaje copiado al portapapeles', 3000, 'success');
+            toastMsg('Mensaje copiado al portapapeles', 3000, 'success');
           });
         }
       }
@@ -883,6 +1225,7 @@
     addBtn.addEventListener('click', addTicket);
     sendBtn.addEventListener('click', sendToWhatsApp);
     copyBtn.addEventListener('click', copyMessageToClipboard);
+    reloadDB.addEventListener('click', reloadArticulosDB);
     clearBtn.addEventListener('click', clearAllTickets);
 
     // Atajos de teclado
@@ -897,12 +1240,20 @@
       }
       if (e.ctrlKey && e.shiftKey && e.key === 'Delete') {
         e.preventDefault();
+        console.log('Atajo de teclado para limpiar activado'); // Debug
         clearAllTickets();
       }
     });
 
     // Inicialización
     updateSummary();
+    
+    // Mostrar estado inicial de la base de datos
+    dbStatus.textContent = 'Base de datos: Cargando...';
+    dbStatus.style.color = '#718096';
+    
+    // Cargar base de datos de artículos al inicio
+    loadArticulosDB();
     
     // Agregar primer ticket automáticamente
     setTimeout(() => {
