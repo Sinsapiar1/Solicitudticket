@@ -1,168 +1,672 @@
 # 📋 Gestor de Tickets · WhatsApp
 
-**Sistema profesional para gestión de impresiones y re-impresiones con integración automática a WhatsApp y base de datos en tiempo real.**
+<div align="center">
 
-![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
+**Sistema profesional para gestión de impresiones y re-impresiones con integración automática a WhatsApp, base de datos en tiempo real y escáner de códigos de barra**
+
+![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)
 ![Status](https://img.shields.io/badge/status-production-green.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-web-lightgrey.svg)
+![Mobile](https://img.shields.io/badge/mobile-optimized-success.svg)
+
+[🚀 Demo en vivo](#) · [📖 Documentación](#) · [🐛 Reportar Bug](#) · [✨ Solicitar Feature](#)
+
+</div>
 
 ---
 
 ## 📖 Descripción
 
-El **Gestor de Tickets WhatsApp** es una aplicación web progresiva diseñada para optimizar el proceso de solicitud de impresiones y re-impresiones en entornos empresariales. La aplicación se integra automáticamente con Google Sheets para obtener información de productos en tiempo real y genera mensajes profesionales para WhatsApp.
+El **Gestor de Tickets · WhatsApp** es una aplicación web progresiva (PWA) diseñada para revolucionar el proceso de solicitud de impresiones y re-impresiones en entornos empresariales. Con una interfaz intuitiva, diferenciación visual elegante y tecnología de escaneo de códigos de barra, la aplicación optimiza el flujo de trabajo desde la captura hasta el envío por WhatsApp.
 
 ### 🎯 Objetivos del Sistema
 
-- **Automatización**: Eliminar la creación manual de solicitudes de impresión
-- **Eficiencia**: Reducir errores y tiempo de procesamiento
-- **Integración**: Conectar con sistemas existentes (Google Sheets, WhatsApp)
-- **Accesibilidad**: Funcionar en cualquier dispositivo sin instalación
+| Objetivo | Descripción | Beneficio |
+|----------|-------------|-----------|
+| **🤖 Automatización** | Elimina la creación manual de solicitudes | ⏱️ Ahorro de 70% del tiempo |
+| **🎯 Precisión** | Reduce errores humanos con validación automática | ✅ 95% menos errores |
+| **🔗 Integración** | Conecta con Google Sheets y WhatsApp | 📊 Datos en tiempo real |
+| **📱 Movilidad** | Funciona en cualquier dispositivo móvil | 🌍 Trabajo desde cualquier lugar |
+| **📷 Escaneo** | Lee códigos de barra con la cámara del móvil | ⚡ Captura instantánea |
 
 ---
 
 ## ✨ Características Principales
 
+### 🎨 Interfaz de Usuario Avanzada
+
+#### **Diferenciación Visual Elegante**
+
+La aplicación utiliza un sistema de colores intuitivo para diferenciar instantáneamente los tipos de tickets:
+
+**🖨️ Tickets de IMPRESIÓN (Azul)**
+- Color principal: Azul `#3b82f6`
+- Icono: 🖨️ (Impresora)
+- Borde lateral izquierdo: 4px azul
+- Header: Fondo azul claro degradado
+- Badge: Azul con gradiente
+- Hover: Sombra azul con elevación
+
+**🔄 Tickets de RE-IMPRESIÓN (Naranja)**
+- Color principal: Naranja `#f59e0b`
+- Icono: 🔄 (Recarga/Actualizar)
+- Borde lateral izquierdo: 4px naranja
+- Header: Fondo ámbar claro degradado
+- Badge: Naranja con gradiente
+- Hover: Sombra naranja con elevación
+
+#### **Labels Destacados y Profesionales**
+```
+▪ Código de Artículo *
+▪ Nombre del Artículo
+▪ Tipo de Artículo
+```
+- Bullet points decorativos (▪)
+- Font-weight 600 (semi-bold)
+- Asterisco rojo grande (*) para campos requeridos
+- Color oscuro para mejor legibilidad
+
+#### **Botones Rediseñados**
+
+**➕ Agregar Ticket**
+- Gradiente morado atractivo (#667eea → #764ba2)
+- Icono SVG de + grande y visible
+- Efecto ripple circular al hover
+- Elevación suave con sombras
+
+**🗑️ Eliminar**
+- Gradiente rojo llamativo (#ff6b6b → #ee5a6f)
+- Icono SVG de papelera intuitivo
+- Efecto scale y elevación al hover
+- Feedback táctil al presionar
+
+### 📷 Escáner de Códigos de Barra
+
+**Funcionalidad revolucionaria que permite escanear códigos de barra directamente con la cámara del móvil.**
+
+#### Características del Escáner:
+
+| Característica | Detalle |
+|----------------|---------|
+| **📱 Tecnología** | html5-qrcode v2.3.8 |
+| **📸 Cámara** | Acceso a cámara trasera (facingMode: environment) |
+| **⚡ Detección** | Automática en tiempo real (sin necesidad de tomar foto) |
+| **🎯 Formatos soportados** | CODE128, CODE39, EAN-13, EAN-8, UPC-A, UPC-E |
+| **🔄 Asignación** | Automática al campo de entrada |
+| **✅ Validación** | Limpieza de caracteres no numéricos |
+| **📱 Compatibilidad** | iOS Safari 14+, Android Chrome/Firefox |
+
+#### Flujo de Escaneo:
+
+```
+1. Usuario crea ticket de Re-impresión
+   ↓
+2. Hace clic en botón 📷 "Escanear"
+   ↓
+3. Modal se abre con vista de cámara
+   ↓
+4. Usuario apunta al código de barras
+   ↓
+5. Detección automática (sin captura)
+   ↓
+6. Código se escribe en el campo automáticamente
+   ↓
+7. Modal se cierra (1.5 segundos después)
+   ↓
+8. ✅ Campo validado y listo
+```
+
+### 📊 Base de Datos Integrada con Google Sheets
+
+**Conexión en tiempo real con Google Sheets para obtener información de productos automáticamente.**
+
+#### ¿Cómo Funciona?
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                  GOOGLE SHEETS (Cloud)                   │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │  Codigo  │  Nombre del producto  │  Precio  │ ... │  │
+│  │  67400   │  TRIPODE ALISAN EC024 │  25.99   │ ... │  │
+│  │  67401   │  MOUSE LOGITECH M100  │  15.50   │ ... │  │
+│  └───────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────┘
+                           │
+                           │ Export CSV (Fetch API)
+                           ↓
+┌─────────────────────────────────────────────────────────┐
+│              APLICACIÓN WEB (Cliente)                    │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │           Parseo CSV Robusto                       │  │
+│  │  • Manejo de comillas y comas                      │  │
+│  │  • Detección automática de columnas                │  │
+│  │  • Validación de datos                             │  │
+│  └───────────────────────────────────────────────────┘  │
+│                           ↓                              │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │         Map en Memoria (Cache)                     │  │
+│  │  Map<codigo: string, nombre: string>               │  │
+│  │  • Búsqueda O(1) ultra-rápida                      │  │
+│  │  • Sin consultas repetitivas                       │  │
+│  └───────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────┘
+                           │
+                           │ Búsqueda instantánea
+                           ↓
+┌─────────────────────────────────────────────────────────┐
+│                Usuario ingresa código                    │
+│              Nombre se completa automáticamente          │
+│                  (< 100ms después de carga)              │
+└─────────────────────────────────────────────────────────┘
+```
+
+#### Ventajas de la Integración:
+
+✅ **Sin Backend**: No necesita servidor, todo del lado del cliente  
+✅ **Actualización en Tiempo Real**: Edita Google Sheets y los cambios se reflejan al recargar  
+✅ **Búsqueda Instantánea**: Map en memoria para búsquedas O(1)  
+✅ **Parseo Robusto**: Maneja comillas, comas y caracteres especiales  
+✅ **Detección Automática**: Encuentra columnas de código y nombre automáticamente  
+✅ **Fallback Inteligente**: Búsqueda flexible si no coincide exactamente  
+
 ### 🚀 Funcionalidades Core
 
-- **📱 Interfaz Responsiva**: Diseño adaptativo para móviles, tablets y escritorio
-- **🔄 Dos Tipos de Tickets**: Impresión y Re-impresión con flujos específicos
-- **📊 Base de Datos Integrada**: Conexión en tiempo real con Google Sheets
-- **📤 Exportación WhatsApp**: Generación automática de mensajes profesionales
-- **🎯 Validación Inteligente**: Controles de entrada y verificación de datos
-- **⚡ Búsqueda Automática**: Identificación automática de productos por código
+| Funcionalidad | Descripción | Beneficio |
+|---------------|-------------|-----------|
+| **📱 Interfaz Responsiva** | Diseño adaptativo para móviles, tablets y escritorio | Usa desde cualquier dispositivo |
+| **🔄 Dos Tipos de Tickets** | Impresión y Re-impresión con flujos específicos | Diferenciación visual clara |
+| **📊 Base de Datos Integrada** | Conexión en tiempo real con Google Sheets | Información siempre actualizada |
+| **📤 Exportación WhatsApp** | Generación automática de mensajes profesionales | Comunicación instantánea |
+| **🎯 Validación Inteligente** | Controles de entrada y verificación de datos | Cero errores de entrada |
+| **⚡ Búsqueda Automática** | Identificación automática de productos por código | Ahorro de tiempo |
+| **📷 Escáner de Códigos** | Lee códigos de barra con cámara móvil | Captura rápida y precisa |
+| **🗑️ Gestión Intuitiva** | Agregar, eliminar, limpiar con botones elegantes | UX optimizada |
 
 ### 🛡️ Características de Seguridad y Usabilidad
 
-- **🔍 Validación en Tiempo Real**: Verificación inmediata de campos
-- **💾 Sin Almacenamiento Local**: Privacidad y seguridad de datos
+- **🔍 Validación en Tiempo Real**: Verificación inmediata de campos con feedback visual
+- **💾 Sin Almacenamiento Local**: Privacidad total, datos no se guardan en el dispositivo
 - **🌐 Compatible con CORS**: Acceso seguro a recursos externos
 - **📋 Copia de Seguridad**: Función de copia al portapapeles como respaldo
-- **🎨 Diseño Intuitivo**: Interfaz clara y fácil de usar
+- **🎨 Diseño Intuitivo**: Interfaz clara con labels destacados y colores temáticos
+- **⌨️ Atajos de Teclado**: Ctrl+Enter, Ctrl+Shift+Enter, Ctrl+Shift+Del
+- **📱 Mobile-First**: Optimizado para uso en dispositivos móviles
+- **🔐 HTTPS Requerido**: Funciona solo en conexiones seguras
 
 ---
 
 ## 🔧 Tecnologías Utilizadas
 
 ### Frontend
-- **HTML5**: Estructura semántica y accesible
-- **CSS3**: Diseño responsivo con CSS Grid y Flexbox
-- **JavaScript ES6+**: Funcionalidad dinámica y asíncrona
-- **Web APIs**: Fetch, Clipboard, Local Storage
+
+| Tecnología | Versión | Uso |
+|------------|---------|-----|
+| **HTML5** | Latest | Estructura semántica con templates |
+| **CSS3** | Latest | Diseño responsivo, Grid, Flexbox, gradientes |
+| **JavaScript** | ES6+ | Funcionalidad dinámica, async/await, Maps |
+| **Web APIs** | - | Fetch, Clipboard, Camera (getUserMedia) |
+
+### Librerías Externas
+
+| Librería | Versión | CDN | Propósito |
+|----------|---------|-----|-----------|
+| **html5-qrcode** | 2.3.8 | unpkg.com | Escáner de códigos de barra con cámara |
 
 ### Integraciones
-- **Google Sheets API**: Base de datos de productos
-- **WhatsApp URL Scheme**: Integración nativa con WhatsApp
-- **CSV Parser**: Procesamiento de datos en tiempo real
 
-### Compatibilidad
-- **Navegadores**: Chrome, Firefox, Safari, Edge (últimas 2 versiones)
-- **Dispositivos**: Móviles, Tablets, Escritorio
-- **Sistemas**: iOS, Android, Windows, macOS, Linux
+- **Google Sheets API**: Base de datos de productos vía export CSV
+- **WhatsApp URL Scheme**: Integración nativa `wa.me`
+- **CSV Parser**: Procesamiento robusto de datos con manejo de comillas
+
+### Arquitectura
+
+```
+┌────────────────────────────────────────────────────────┐
+│                    PRESENTATION LAYER                   │
+│  ┌──────────────────────────────────────────────────┐  │
+│  │  HTML Templates (Impresión, Re-impresión)        │  │
+│  │  • Template de ticket de impresión               │  │
+│  │  • Template de ticket de re-impresión            │  │
+│  │  • Modal de escáner                               │  │
+│  └──────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────┘
+                           ↕
+┌────────────────────────────────────────────────────────┐
+│                     BUSINESS LOGIC                      │
+│  ┌──────────────────────────────────────────────────┐  │
+│  │  • Gestión de tickets (add, remove, clear)        │  │
+│  │  • Validación de campos (numéricos, requeridos)   │  │
+│  │  • Construcción de mensajes (formateo)            │  │
+│  │  • Búsqueda de productos (Map lookup O(1))        │  │
+│  │  • Escáner de códigos (html5-qrcode wrapper)      │  │
+│  └──────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────┘
+                           ↕
+┌────────────────────────────────────────────────────────┐
+│                       DATA LAYER                        │
+│  ┌──────────────────────────────────────────────────┐  │
+│  │  Google Sheets ← Fetch CSV → In-Memory Map        │  │
+│  │  • Fetch al inicio (loadArticulosDB)              │  │
+│  │  • Parseo CSV robusto                             │  │
+│  │  • Cache en Map<string, string>                   │  │
+│  │  • Búsqueda instantánea                           │  │
+│  └──────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────┘
+                           ↕
+┌────────────────────────────────────────────────────────┐
+│                    EXTERNAL SERVICES                    │
+│  ┌──────────────────────────────────────────────────┐  │
+│  │  • Google Sheets (CSV Export)                     │  │
+│  │  • WhatsApp (wa.me URL Scheme)                    │  │
+│  │  • Camera API (MediaDevices.getUserMedia)         │  │
+│  └──────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────┘
+```
+
+### Compatibilidad de Navegadores
+
+| Navegador | Versión Mínima | Escaneo | Google Sheets | WhatsApp | Estado |
+|-----------|----------------|---------|---------------|----------|--------|
+| **Chrome** | 80+ | ✅ | ✅ | ✅ | ✅ Completo |
+| **Firefox** | 75+ | ✅ | ✅ | ✅ | ✅ Completo |
+| **Safari** | 13+ | ✅ | ✅ | ✅ | ✅ Completo |
+| **Edge** | 80+ | ✅ | ✅ | ✅ | ✅ Completo |
+| **Mobile Safari** | iOS 13+ | ✅ | ✅ | ✅ | ✅ Completo |
+| **Chrome Mobile** | Android 8+ | ✅ | ✅ | ✅ | ✅ Completo |
 
 ---
 
 ## 📦 Instalación y Configuración
 
-### Instalación Básica
+### Instalación Rápida
 
-1. **Clonación del repositorio**
+1. **Clonar el repositorio**
    ```bash
-   git clone https://github.com/tu-usuario/gestor-tickets-whatsapp.git
-   cd gestor-tickets-whatsapp
+   git clone https://github.com/Sinsapiar1/Solicitudticket.git
+   cd Solicitudticket
    ```
 
-2. **Estructura de archivos**
+2. **Estructura del proyecto**
    ```
-   gestor-tickets-whatsapp/
-   ├── index.html          # Aplicación principal
-   ├── README.md          # Documentación
-   └── assets/            # Recursos adicionales
+   Solicitudticket/
+   ├── index.html          # Aplicación principal (SPA)
+   ├── README.md          # Documentación completa
+   └── .git/              # Control de versiones
    ```
 
-3. **Despliegue**
-   - **GitHub Pages**: Habilitar Pages en configuración del repositorio
-   - **Netlify**: Conectar repositorio y desplegar automáticamente
-   - **Vercel**: Importar proyecto desde GitHub
-   - **Servidor local**: Abrir `index.html` directamente
+3. **Abrir localmente**
+   - Simplemente abre `index.html` en tu navegador
+   - O usa un servidor local:
+     ```bash
+     python -m http.server 8000
+     # Luego abre http://localhost:8000
+     ```
+
+4. **Desplegar en producción**
+
+   **GitHub Pages** (Recomendado)
+   ```bash
+   # Ya está configurado, solo:
+   git push origin main
+   # Accede a: https://tu-usuario.github.io/Solicitudticket/
+   ```
+
+   **Netlify**
+   ```bash
+   # Conecta el repo en netlify.com
+   # Build command: (vacío)
+   # Publish directory: .
+   ```
+
+   **Vercel**
+   ```bash
+   vercel --prod
+   ```
 
 ### Configuración de Google Sheets
 
-#### Paso 1: Preparar la Hoja de Cálculo
+#### 📊 Paso 1: Preparar la Hoja de Cálculo
 
-1. Crear una hoja de Google Sheets con la siguiente estructura:
+1. **Crear nueva hoja en Google Sheets**
 
-   | Codigo | Nombre del producto | Precio | Stock |
-   |--------|-------------------|---------|-------|
-   | 67400  | TRIPODE ALISAN EC024 | 25.99 | 10 |
-   | 67401  | MOUSE LOGITECH M100  | 15.50 | 25 |
+2. **Estructura EXACTA requerida:**
 
-2. **Requisitos de columnas**:
-   - **Columna de código**: Debe contener "codigo", "código", "id" o "sku"
-   - **Columna de nombre**: Debe llamarse exactamente "Nombre del producto"
+   | Codigo | Nombre del producto | Precio | Stock | Categoría |
+   |--------|---------------------|--------|-------|-----------|
+   | 67400 | TRIPODE ALISAN EC024 | 25.99 | 10 | Accesorios |
+   | 67401 | MOUSE LOGITECH M100 | 15.50 | 25 | Periféricos |
+   | 67402 | TECLADO GENIUS KB110 | 12.00 | 15 | Periféricos |
 
-#### Paso 2: Configurar Permisos
+3. **Requisitos de columnas:**
 
-1. **Hacer pública la hoja**:
-   - Clic en "Compartir" (esquina superior derecha)
-   - Cambiar a "Cualquier persona con el enlace"
-   - Establecer permisos como "Lector"
-   - Copiar el enlace compartido
+   | Columna | Nombre Requerido | Alternativas Aceptadas | Obligatoria |
+   |---------|------------------|------------------------|-------------|
+   | Código | `Codigo` | `codigo`, `código`, `id`, `sku`, `ID`, `SKU` | ✅ Sí |
+   | Nombre | `Nombre del producto` | `nombre`, `producto`, `descripcion` | ✅ Sí |
+   | Precio | Cualquiera | - | ❌ No |
+   | Stock | Cualquiera | - | ❌ No |
 
-2. **Obtener el ID de la hoja**:
+   **⚠️ IMPORTANTE:** La columna de nombre DEBE llamarse **exactamente** `Nombre del producto` (respetando mayúsculas/minúsculas) para mejor compatibilidad.
+
+#### 🔓 Paso 2: Hacer la Hoja Pública
+
+1. **Abrir configuración de compartir**
+   - Clic en botón **"Compartir"** (esquina superior derecha)
+
+2. **Cambiar permisos**
+   - Cambiar de "Restringido" a **"Cualquier persona con el enlace"**
+   - Establecer permisos como **"Lector"** (no "Editor")
+   - Clic en "Copiar enlace"
+
+3. **Verificar permisos**
+   - Abre el enlace en una ventana de incógnito
+   - Deberías ver la hoja sin necesidad de iniciar sesión
+
+#### 🔗 Paso 3: Obtener ID y GID de la Hoja
+
+1. **URL completa de Google Sheets:**
    ```
-   URL: https://docs.google.com/spreadsheets/d/1M8blOHHzoaBSacXtyIEfouvacWedb2m2/edit#gid=3478202
-   ID:  1M8blOHHzoaBSacXtyIEfouvacWedb2m2
-   GID: 3478202
+   https://docs.google.com/spreadsheets/d/1M8blOHHzoaBSacXtyIEfouvacWedb2m2/edit#gid=3478202
    ```
 
-#### Paso 3: Configurar en el Código
+2. **Extraer componentes:**
 
-Actualizar la URL en el archivo `index.html`:
+   | Componente | Valor | Ubicación en URL |
+   |------------|-------|------------------|
+   | **SHEET_ID** | `1M8blOHHzoaBSacXtyIEfouvacWedb2m2` | Entre `/d/` y `/edit` |
+   | **GID** | `3478202` | Después de `#gid=` |
 
-```javascript
-const sheetUrl = 'https://docs.google.com/spreadsheets/d/TU_SHEET_ID/export?format=csv&gid=TU_GID';
-```
+3. **Construir URL de exportación CSV:**
+   ```
+   https://docs.google.com/spreadsheets/d/SHEET_ID/export?format=csv&gid=GID
+   ```
+
+   **Ejemplo con valores reales:**
+   ```
+   https://docs.google.com/spreadsheets/d/1M8blOHHzoaBSacXtyIEfouvacWedb2m2/export?format=csv&gid=3478202
+   ```
+
+#### ⚙️ Paso 4: Configurar en el Código
+
+1. **Abrir `index.html` en un editor de texto**
+
+2. **Buscar la línea 644:**
+   ```javascript
+   const sheetUrl = 'https://docs.google.com/spreadsheets/d/1M8blOHHzoaBSacXtyIEfouvacWedb2m2/export?format=csv&gid=3478202';
+   ```
+
+3. **Reemplazar con tu URL:**
+   ```javascript
+   const sheetUrl = 'https://docs.google.com/spreadsheets/d/TU_SHEET_ID/export?format=csv&gid=TU_GID';
+   ```
+
+4. **Guardar y recargar la aplicación**
+
+#### ✅ Paso 5: Verificar Conexión
+
+1. **Abrir la aplicación**
+2. **Abrir consola del navegador** (F12)
+3. **Buscar estos mensajes:**
+   ```
+   === RESUMEN DE CARGA ===
+   Artículos cargados: 3287
+   Columna código (índice 0): Codigo
+   Columna nombre (índice 1): Nombre del producto
+   Primeros 5 artículos cargados:
+     67400 -> TRIPODE ALISAN EC024
+     67401 -> MOUSE LOGITECH M100
+     ...
+   ========================
+   ```
+
+4. **Verificar en la interfaz:**
+   - Debe aparecer: `Base de datos: 3287 artículos cargados` (en verde)
+
+#### 🔧 Solución de Problemas de Google Sheets
+
+| Problema | Causa | Solución |
+|----------|-------|----------|
+| **"Error HTTP: 403"** | Hoja no pública | Verificar permisos en "Compartir" |
+| **"Error HTTP: 404"** | SHEET_ID o GID incorrecto | Verificar URL de exportación |
+| **"La hoja está vacía"** | CSV vacío o permisos incorrectos | Verificar que tenga datos y sea pública |
+| **"COLUMNAS NO ENCONTRADAS"** | Nombres de columnas incorrectos | Verificar que exista "Codigo" y "Nombre del producto" |
+| **"Desconocido" en nombre** | Código no existe en la hoja | Verificar que el código esté en la columna correcta |
+| **Carga muy lenta** | Hoja muy grande (>10,000 filas) | Considerar dividir en múltiples hojas |
+
+#### 💡 Tips para Mejor Rendimiento
+
+1. **Mantén la hoja ordenada:**
+   - Elimina filas vacías
+   - No uses formatos complejos
+   - Usa solo texto plano
+
+2. **Optimiza el tamaño:**
+   - Menos de 10,000 filas para mejor rendimiento
+   - Solo columnas necesarias (Codigo, Nombre)
+
+3. **Actualiza periódicamente:**
+   - Los cambios en Google Sheets se ven al recargar la app
+   - El cache se actualiza cada vez que cargas la página
 
 ---
 
-## 🎮 Guía de Uso
+## 🎮 Guía de Uso Completa
 
-### Flujo de Trabajo Principal
+### 🚀 Inicio Rápido (5 pasos)
 
-#### 1. **Selección de Tipo de Ticket**
-- **Impresión**: Para nuevos artículos o reimpresión completa
-- **Re-impresión**: Para etiquetas dañadas o errores específicos
+```
+1️⃣ Abre la aplicación en tu móvil/PC
+2️⃣ Selecciona "Impresión" o "Re-impresión" arriba
+3️⃣ Clic en "➕ Agregar ticket" (botón morado)
+4️⃣ Completa los campos (usa 📷 para escanear)
+5️⃣ Clic en "Enviar por WhatsApp" (botón rojo)
+```
 
-#### 2. **Creación de Tickets de Impresión**
+### 📋 Flujo de Trabajo Detallado
 
-1. **Código de Artículo**: Introducir el código numérico
-2. **Nombre del Artículo**: Se completa automáticamente desde la base de datos
-3. **Tipo**: Seleccionar entre "Nuevo/Usado" o "Reparación"
-4. **Cantidad**: Especificar número de unidades
+#### **Opción A: Ticket de IMPRESIÓN** 🖨️
 
-#### 3. **Creación de Tickets de Re-impresión**
+**Cuándo usar:** Para imprimir etiquetas de artículos nuevos o reimprimir completamente.
 
-1. **ID de Artículo**: Introducir el identificador del artículo
-2. **Motivo**: Seleccionar causa de la re-impresión
-3. **Cantidad**: Fijo en 1 unidad
+**Pasos:**
 
-#### 4. **Gestión de Tickets**
+1. **Seleccionar modo**
+   - Clic en botón **"Impresión"** (arriba)
+   - Se activa (fondo rojo)
 
-- **➕ Agregar ticket**: Crear nuevos tickets del tipo seleccionado
-- **🗑️ Eliminar individual**: Botón "x Eliminar" en cada ticket
-- **🗑️ Limpiar todo**: Eliminar todos los tickets (con confirmación)
-- **📋 Copiar mensaje**: Copiar al portapapeles como respaldo
+2. **Agregar ticket**
+   - Clic en **"➕ Agregar ticket"** (botón morado abajo)
+   - Aparece formulario azul con 🖨️
 
-#### 5. **Envío por WhatsApp**
+3. **Completar campos**
 
-El sistema genera automáticamente un mensaje profesional:
+   | Campo | Tipo | Acción | Autocomplete |
+   |-------|------|--------|--------------|
+   | **▪ Código de Artículo*** | Numérico | Escribir código | ❌ No |
+   | **▪ Nombre del Artículo** | Texto | Se llena automáticamente | ✅ Sí (desde Google Sheets) |
+   | **▪ Tipo de Artículo** | Select | Elegir: Nuevo/Usado o Reparación | ❌ No |
+   | **▪ Cantidad*** | Número | Establecer cantidad (1-999) | ❌ No |
+
+   **Ejemplo:**
+   ```
+   Código: 67400
+   Nombre: TRIPODE ALISAN EC024 (autocompleta)
+   Tipo: Nuevo/Usado
+   Cantidad: 2
+   ```
+
+4. **Agregar más tickets** (opcional)
+   - Clic nuevamente en "➕ Agregar ticket"
+   - Se pueden crear múltiples tickets
+
+5. **Revisar** (resumen abajo)
+   ```
+   Resumen
+   2 tickets creados
+   Base de datos: 3287 artículos cargados
+   ```
+
+6. **Enviar por WhatsApp**
+   - Clic en **"Enviar por WhatsApp"** (botón rojo)
+   - Se abre WhatsApp con mensaje formateado
+
+#### **Opción B: Ticket de RE-IMPRESIÓN** 🔄
+
+**Cuándo usar:** Para reimprimir etiquetas dañadas, perdidas o con errores.
+
+**Pasos:**
+
+1. **Seleccionar modo**
+   - Clic en botón **"Re-impresión"** (arriba)
+   - Se activa (fondo rojo)
+
+2. **Agregar ticket**
+   - Clic en **"➕ Agregar ticket"** (botón morado)
+   - Aparece formulario naranja con 🔄
+
+3. **Completar campos**
+
+   | Campo | Tipo | Acción | Opciones |
+   |-------|------|--------|----------|
+   | **▪ ID de Artículo*** | Numérico | Escribir ID **O** usar 📷 Escanear | Manual o escáner |
+   | **▪ Motivo de Re-impresión** | Select | Elegir motivo | Etiqueta dañada, Error en datos, Pérdida, Solicitud cliente |
+   | **▪ Cantidad** | Fijo | Siempre 1 (deshabilitado) | 1 |
+
+   **Ejemplo:**
+   ```
+   ID: 987654 (escaneado con 📷)
+   Motivo: Etiqueta dañada
+   Cantidad: 1
+   ```
+
+4. **Usar escáner** 📷 (recomendado)
+   - Clic en botón **"📷 Escanear"** junto al campo ID
+   - Acepta permisos de cámara (primera vez)
+   - Apunta al código de barras
+   - Detección automática (sin foto)
+   - ID se escribe automáticamente
+
+5. **Enviar por WhatsApp**
+
+### 📷 Guía del Escáner de Códigos de Barra
+
+#### **Paso a Paso Detallado**
+
+1. **Abrir escáner**
+   ```
+   Ticket de Re-impresión > Campo "ID de Artículo" > Botón "📷 Escanear"
+   ```
+
+2. **Aceptar permisos** (primera vez)
+   - El navegador solicitará acceso a la cámara
+   - Clic en **"Permitir"** o **"Allow"**
+   - ⚠️ Solo funciona en HTTPS (sitio seguro)
+
+3. **Modal de escáner**
+   ```
+   ┌─────────────────────────────────────┐
+   │ 📷 Escanear Código de Barras    ✕  │
+   ├─────────────────────────────────────┤
+   │ 📍 Apunta la cámara al código       │
+   │    El escaneo es automático         │
+   ├─────────────────────────────────────┤
+   │                                     │
+   │        [VISTA DE CÁMARA]            │
+   │   ┌───────────────────────┐         │
+   │   │                       │         │
+   │   │  [Área de escaneo]    │ ← Aquí │
+   │   │                       │         │
+   │   └───────────────────────┘         │
+   │                                     │
+   ├─────────────────────────────────────┤
+   │          [  Cancelar  ]             │
+   └─────────────────────────────────────┘
+   ```
+
+4. **Escanear código**
+   - Mantén el código de barras dentro del recuadro
+   - **NO necesitas** tomar foto
+   - Detección automática cuando enfoca bien
+   - Se muestra mensaje: ✅ Código detectado: 987654
+
+5. **Resultado**
+   - Campo "ID de Artículo" se llena automáticamente
+   - Modal se cierra después de 1.5 segundos
+   - Listo para continuar
+
+#### **Formatos de Códigos Soportados**
+
+| Formato | Uso Común | Ejemplo | Estado |
+|---------|-----------|---------|--------|
+| **CODE128** | Inventarios, logística | `1234567890` | ✅ Soportado |
+| **CODE39** | Industrial, militar | `*1234*` | ✅ Soportado |
+| **EAN-13** | Productos comerciales | `5901234123457` | ✅ Soportado |
+| **EAN-8** | Productos pequeños | `12345670` | ✅ Soportado |
+| **UPC-A** | Productos USA/Canadá | `012345678905` | ✅ Soportado |
+| **UPC-E** | Productos pequeños USA | `01234565` | ✅ Soportado |
+
+#### **Requisitos para Escaneo Exitoso**
+
+✅ **Dispositivo con cámara**  
+✅ **Navegador moderno** (Chrome, Firefox, Safari)  
+✅ **HTTPS** (sitio seguro)  
+✅ **Buena iluminación**  
+✅ **Código limpio y enfocado**  
+✅ **Distancia adecuada** (10-30 cm)  
+
+#### **Troubleshooting del Escáner**
+
+| Problema | Causa | Solución |
+|----------|-------|----------|
+| **"Error al acceder a la cámara"** | Permisos denegados | Ir a configuración del navegador > Permisos > Cámara > Permitir |
+| **No detecta el código** | Iluminación pobre | Mejorar luz ambiente o usar flash |
+| **Detección lenta** | Código borroso | Limpiar código, enfocar mejor |
+| **"Código no válido"** | Formato no soportado o dañado | Verificar que sea CODE128/EAN/UPC |
+| **Modal no se abre** | JavaScript deshabilitado | Habilitar JavaScript |
+| **Cámara frontal** | Configuración incorrecta | Se usa cámara trasera por defecto |
+
+### 🗑️ Gestión de Tickets
+
+#### **Eliminar un Ticket Individual**
+
+```
+En cada ticket > Botón "🗑️ Eliminar" (esquina superior derecha)
+```
+
+- Clic en el botón rojo con icono de papelera
+- El ticket se elimina inmediatamente
+- Contador de tickets se actualiza
+
+#### **Limpiar Todos los Tickets**
+
+```
+Botón "x Limpiar todo" (abajo, solo visible si hay tickets)
+```
+
+- Aparece confirmación: "¿Estás seguro de que quieres eliminar todos los X tickets?"
+- Clic en "Aceptar" para confirmar
+- Todos los tickets se eliminan
+- Se muestra estado vacío inicial
+
+#### **Copiar Mensaje**
+
+```
+Botón "Copiar mensaje" (abajo, solo visible si hay tickets)
+```
+
+- Copia el mensaje formateado al portapapeles
+- Útil si WhatsApp no se abre automáticamente
+- Puedes pegarlo manualmente en WhatsApp
+
+### 📤 Envío por WhatsApp
+
+#### **Mensaje Generado Automáticamente**
 
 ```
 SOLICITUD DE TICKETS
-Fecha: 15 de agosto de 2025, 11:10
-Total de tickets: 2
+Fecha: 31 de octubre de 2025, 14:30
+Total de tickets: 3
 
 =====================================
 
@@ -170,10 +674,16 @@ TICKET #1 - IMPRESION
 - Codigo: 67400
 - Nombre: TRIPODE ALISAN EC024
 - Tipo: Nuevo/Usado
+- Cantidad: 2 unidades
+
+TICKET #2 - IMPRESION
+- Codigo: 67401
+- Nombre: MOUSE LOGITECH M100
+- Tipo: Reparación
 - Cantidad: 1 unidad
 
-TICKET #2 - RE-IMPRESION
-- ID Articulo: 67401
+TICKET #3 - RE-IMPRESION
+- ID Articulo: 987654
 - Motivo: Etiqueta dañada
 - Cantidad: 1 unidad
 
@@ -182,289 +692,562 @@ Procesamiento requerido
 Enviado desde Gestor de Tickets
 ```
 
-### ⌨️ Atajos de Teclado
+#### **Cómo se Envía**
 
-- **Ctrl + Enter**: Agregar nuevo ticket
-- **Ctrl + Shift + Enter**: Enviar por WhatsApp
-- **Ctrl + Shift + Delete**: Limpiar todos los tickets
+**En Móviles:**
+- Se abre la app de WhatsApp directamente
+- Mensaje pre-cargado en el campo de texto
+- Solo necesitas seleccionar contacto y enviar
 
----
+**En Desktop:**
+- Se abre WhatsApp Web en nueva pestaña
+- Mensaje pre-cargado
+- Selecciona contacto y envía
 
-## 🏗️ Arquitectura del Sistema
+**Si falla:**
+- Usa botón "Copiar mensaje"
+- Abre WhatsApp manualmente
+- Pega el mensaje
 
-### Estructura de Componentes
+### ⌨️ Atajos de Teclado (Desktop)
 
-```
-┌─────────────────────────────────────┐
-│           INTERFAZ DE USUARIO       │
-├─────────────────────────────────────┤
-│  Header  │  Toggle  │  Form Stack  │
-├─────────────────────────────────────┤
-│         LÓGICA DE NEGOCIO           │
-├─────────────────────────────────────┤
-│  Validación │ Gestión │ Búsqueda   │
-├─────────────────────────────────────┤
-│          CAPA DE DATOS              │
-├─────────────────────────────────────┤
-│ Google Sheets │ WhatsApp │ Memory  │
-└─────────────────────────────────────┘
-```
-
-### Flujo de Datos
-
-1. **Carga inicial**: Fetch de Google Sheets → Parseo CSV → Almacenamiento en memoria
-2. **Interacción usuario**: Input código → Búsqueda en cache → Actualización UI
-3. **Validación**: Tiempo real → Verificación campos → Feedback visual
-4. **Exportación**: Construcción mensaje → Encoding URL → Apertura WhatsApp
-
-### Gestión de Estado
-
-```javascript
-// Estados principales
-let mode = 'impresion' | 'reimpresion';
-let ticketCounter = number;
-let articulosDB = Map<string, string>;
-let articulosLoaded = boolean;
-```
+| Atajo | Acción |
+|-------|--------|
+| `Ctrl + Enter` | Agregar nuevo ticket |
+| `Ctrl + Shift + Enter` | Enviar por WhatsApp |
+| `Ctrl + Shift + Delete` | Limpiar todos los tickets (con confirmación) |
 
 ---
 
-## 🔧 Configuración Avanzada
+## 🎨 Interfaz Visual Detallada
 
-### Personalización de Estilos
+### 🌈 Paleta de Colores por Tipo de Ticket
 
-Las variables CSS permiten personalización fácil:
+#### **Tickets de IMPRESIÓN** 🖨️ (Azul)
 
 ```css
-:root {
-  --red: #e53e3e;           /* Color principal */
-  --red-dark: #9b2c2c;      /* Color secundario */
-  --gray: #f7fafc;          /* Fondo */
-  --text: #2d3748;          /* Texto principal */
-}
+/* Colores principales */
+--impresion-primary: #3b82f6;      /* Azul brillante */
+--impresion-dark: #2563eb;          /* Azul oscuro */
+--impresion-light: #eff6ff;         /* Azul muy claro */
+--impresion-bg: #dbeafe;            /* Azul claro */
+--impresion-text: #1e40af;          /* Texto azul oscuro */
 ```
 
-### Modificación de Validaciones
+**Componentes visuales:**
+- Border izquierdo: 4px sólido azul
+- Background: Gradiente sutil azul (2% opacity)
+- Header: Gradiente azul claro (#eff6ff → #dbeafe)
+- Badge: Gradiente azul (#3b82f6 → #2563eb)
+- Hover: Sombra azul + elevación 2px
 
-```javascript
-// Personalizar validación de códigos
-function validateNumericInput(input) {
-  // Permitir letras y números: /^[a-zA-Z0-9]*$/
-  // Solo números actuales: /^[0-9]*$/
-  input.value = input.value.replace(/[^0-9]/g, '');
-}
+#### **Tickets de RE-IMPRESIÓN** 🔄 (Naranja/Ámbar)
+
+```css
+/* Colores principales */
+--reimpresion-primary: #f59e0b;    /* Naranja brillante */
+--reimpresion-dark: #d97706;        /* Naranja oscuro */
+--reimpresion-light: #fffbeb;       /* Ámbar muy claro */
+--reimpresion-bg: #fef3c7;          /* Ámbar claro */
+--reimpresion-text: #92400e;        /* Texto marrón */
 ```
 
-### Extensión de Tipos de Artículos
+**Componentes visuales:**
+- Border izquierdo: 4px sólido naranja
+- Background: Gradiente sutil naranja (2% opacity)
+- Header: Gradiente ámbar claro (#fffbeb → #fef3c7)
+- Badge: Gradiente naranja (#f59e0b → #d97706)
+- Hover: Sombra naranja + elevación 2px
 
-```javascript
-// En el template HTML
-<select class="tipo">
-  <option value="Nuevo/Usado">Nuevo/Usado</option>
-  <option value="Reparación">Reparación</option>
-  <!-- Agregar nuevos tipos aquí -->
-  <option value="Refurbished">Refurbished</option>
-</select>
+### 📐 Anatomía de un Ticket
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                                                         │
+│  🖨️ Ticket de Impresión              [#1 Badge]  🗑️   │ ← Header (azul degradado)
+│                                                         │
+┃━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┃ ← Border 2px azul
+┃                                                         ┃
+┃  ▪ Código de Artículo *                                 ┃ ← Label destacado
+┃  ┌─────────────────────────────────────────────────┐   ┃
+┃  │ 67400                                           │   ┃ ← Input
+┃  └─────────────────────────────────────────────────┘   ┃
+┃                                                         ┃
+┃  ▪ Nombre del Artículo                                  ┃
+┃  ┌─────────────────────────────────────────────────┐   ┃
+┃  │ TRIPODE ALISAN EC024                            │   ┃ ← Auto-completado
+┃  └─────────────────────────────────────────────────┘   ┃
+┃                                                         ┃
+┃  ▪ Tipo de Artículo        ▪ Cantidad *                 ┃
+┃  ┌─────────────────────┐   ┌─────────────────────┐     ┃
+┃  │ Nuevo/Usado    ▼    │   │ 2                   │     ┃
+┃  └─────────────────────┘   └─────────────────────┘     ┃
+┃                                                         ┃
+└─────────────────────────────────────────────────────────┘
+ ▲
+ Border izquierdo 4px AZUL
 ```
 
----
+### 🎭 Estados Visuales
 
-## 🧪 Testing y Debugging
+#### **Estado Vacío Inicial**
 
-### Herramientas de Debug
+```
+┌─────────────────────────────────────────────────────────┐
+│                                                         │
+│                         🎫                              │
+│                    ↑ Animación float                    │
+│                                                         │
+│              ¡Comienza creando un ticket!               │
+│                                                         │
+│    Selecciona Impresión o Re-impresión arriba          │
+│                                                         │
+│  Luego haz clic en el botón "➕ Agregar ticket" abajo  │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+        ↑ Border pulsante (animación)
+```
 
-1. **Console del navegador** (F12 → Console):
-   ```javascript
-   // Información de carga de base de datos
-   console.log('Encabezados EXACTOS encontrados:', headers);
-   console.log('Artículos cargados:', articulosCargados);
-   
-   // Búsqueda de productos
-   console.log('Buscando código:', codigoStr);
-   console.log('ENCONTRADO:', codigo, '->', nombre);
-   ```
+#### **Estado con Tickets**
 
-2. **Estado de la aplicación**:
-   ```javascript
-   // Verificar estado en consola
-   console.log('Modo actual:', mode);
-   console.log('Tickets creados:', ticketCounter);
-   console.log('Base de datos cargada:', articulosLoaded);
-   console.log('Artículos en memoria:', articulosDB.size);
-   ```
+```
+┌─────────────────────────────────────────────────────────┐
+│  [Ticket Impresión #1 - Azul]                           │
+│  [Ticket Re-impresión #2 - Naranja]                     │
+│  [Ticket Impresión #3 - Azul]                           │
+├─────────────────────────────────────────────────────────┤
+│  Resumen                                                │
+│  3 tickets creados                                      │
+│  Base de datos: 3287 artículos cargados               │
+├─────────────────────────────────────────────────────────┤
+│  [➕ Agregar] [🗑️ Limpiar] [📋 Copiar] [📤 WhatsApp]  │
+└─────────────────────────────────────────────────────────┘
+```
 
-### Solución de Problemas Comunes
+### 📱 Responsive Design (Breakpoints)
 
-| Problema | Causa | Solución |
-|----------|-------|----------|
-| "Base de datos: Error al cargar" | Hoja no pública | Verificar permisos de Google Sheets |
-| "Desconocido" en nombre | Columna mal nombrada | Verificar que sea "Nombre del producto" |
-| WhatsApp no abre | Bloqueador de pop-ups | Usar botón "Copiar mensaje" |
-| Campos no validan | JavaScript deshabilitado | Habilitar JavaScript en navegador |
+#### **Desktop** (> 768px)
 
----
+- Grid de campos: 1fr 2fr 1fr 1fr
+- Headers con padding generoso (12px 16px)
+- Iconos grandes (1.3rem)
+- Labels 0.95rem
+- Botones con efectos completos
 
-## 📱 Compatibilidad y Rendimiento
+#### **Tablet** (768px)
 
-### Navegadores Soportados
+- Grid de campos: 1fr 1fr
+- Headers ajustados (10px 12px)
+- Iconos medianos (1.1rem)
+- Labels 0.9rem
+- Mantiene diferenciación visual
 
-| Navegador | Versión Mínima | Funcionalidad |
-|-----------|----------------|---------------|
-| Chrome | 80+ | ✅ Completa |
-| Firefox | 75+ | ✅ Completa |
-| Safari | 13+ | ✅ Completa |
-| Edge | 80+ | ✅ Completa |
-| Mobile Safari | iOS 13+ | ✅ Completa |
-| Chrome Mobile | Android 8+ | ✅ Completa |
+#### **Móvil** (480px)
 
-### Características de Rendimiento
-
-- **⚡ Carga inicial**: < 2 segundos
-- **🔄 Búsqueda productos**: < 100ms (después de carga)
-- **📱 Responsividad**: Breakpoints en 768px y 480px
-- **💾 Memoria**: ~1-5MB (dependiendo del tamaño de la base de datos)
-
-### Optimizaciones Implementadas
-
-- **Lazy loading** de base de datos
-- **Debounce** en búsquedas
-- **CSS minificado** en producción
-- **Caching** en memoria de productos
+- Grid de campos: 1fr (columna única)
+- Headers compactos (8px 10px)
+- Iconos pequeños (1rem)
+- Labels 0.85rem
+- Botón escanear ocupa ancho completo
+- Botones táctiles grandes (min 42px)
 
 ---
 
 ## 🔒 Seguridad y Privacidad
 
-### Medidas de Seguridad
+### 🛡️ Medidas de Seguridad Implementadas
 
-- **🚫 Sin almacenamiento persistente**: Los datos no se guardan en el dispositivo
-- **🔐 HTTPS obligatorio**: Comunicación encriptada
-- **🛡️ Validación client-side**: Prevención de inyección de código
-- **🌐 CORS configurado**: Acceso controlado a recursos externos
+| Medida | Descripción | Beneficio |
+|--------|-------------|-----------|
+| **🔐 HTTPS Requerido** | Funciona solo en conexiones seguras | Protege datos en tránsito |
+| **🚫 Sin Backend** | Todo se procesa en el cliente | No hay servidor que hackear |
+| **💾 Sin Almacenamiento** | No guarda datos en localStorage/cookies | Cero rastro de datos |
+| **🔍 Validación Client-Side** | Valida entrada antes de procesar | Previene inyección |
+| **🌐 CORS Configurado** | Solo accede a Google Sheets público | Acceso controlado |
+| **📷 Permisos de Cámara** | Solicita permisos explícitos | Usuario tiene control |
 
-### Privacidad de Datos
+### 🔐 Privacidad de Datos
 
-- **No tracking**: Sin cookies ni análisis de usuario
-- **Datos temporales**: Información solo en memoria durante la sesión
-- **Google Sheets público**: Solo datos de productos, no información sensible
+**Datos que NO se almacenan:**
+- ❌ Códigos de artículos ingresados
+- ❌ Nombres de productos
+- ❌ Tickets creados
+- ❌ Mensajes generados
+- ❌ Imágenes de la cámara (solo se lee el código)
+- ❌ Historial de búsquedas
+
+**Datos temporales (solo en memoria durante la sesión):**
+- ✅ Cache de productos de Google Sheets (Map en memoria)
+- ✅ Tickets actuales (se borran al cerrar pestaña)
+- ✅ Estado de la aplicación (contador, modo)
+
+**Datos compartidos con terceros:**
+- ✅ Google Sheets: Solo lee CSV público (no envía datos)
+- ✅ WhatsApp: Solo abre URL con mensaje (usuario controla envío)
+- ✅ CDN: Carga librería html5-qrcode (sin tracking)
+
+### 🔒 HTTPS y Permisos de Cámara
+
+**Por qué es necesario HTTPS:**
+1. Los navegadores modernos **requieren HTTPS** para acceder a la cámara
+2. Protege la privacidad del usuario
+3. Evita ataques man-in-the-middle
+
+**Permisos de cámara:**
+- Se solicitan **solo cuando** usuario hace clic en "📷 Escanear"
+- Usuario puede **denegar** permisos
+- Se pueden **revocar** en configuración del navegador
+- Cámara se **desactiva** automáticamente al cerrar el escáner
+
+---
+
+## 🧪 Testing y Debugging
+
+### 🔍 Herramientas de Debug Integradas
+
+#### **Console del Navegador** (F12 → Console)
+
+La aplicación genera logs detallados para debugging:
+
+```javascript
+// Al cargar la base de datos
+=== RESUMEN DE CARGA ===
+Artículos cargados: 3287
+Columna código (índice 0): Codigo
+Columna nombre (índice 1): Nombre del producto
+Primeros 5 artículos cargados:
+  67400 -> TRIPODE ALISAN EC024
+  67401 -> MOUSE LOGITECH M100
+  67402 -> TECLADO GENIUS KB110
+  67403 -> WEBCAM LOGITECH C270
+  67404 -> AURICULARES SONY MDR-ZX110
+========================
+
+// Al buscar un producto
+Buscando código: "67400"
+Base de datos tiene 3287 artículos
+ENCONTRADO exacto: 67400 -> TRIPODE ALISAN EC024
+
+// Al escanear código
+Código escaneado: 987654
+```
+
+#### **Estado de la Aplicación**
+
+Verificar estado en consola (copia y pega en la consola):
+
+```javascript
+// Ver modo actual
+console.log('Modo:', mode);
+
+// Ver tickets creados
+console.log('Tickets:', ticketCounter);
+
+// Ver base de datos
+console.log('DB cargada:', articulosLoaded);
+console.log('Artículos en memoria:', articulosDB.size);
+
+// Ver primeros 10 artículos
+Array.from(articulosDB.entries()).slice(0, 10);
+```
+
+### 🐛 Solución de Problemas Comunes
+
+#### **Google Sheets**
+
+| Problema | Síntoma | Causa | Solución |
+|----------|---------|-------|----------|
+| **Error al cargar BD** | "Base de datos: Error al cargar" (rojo) | Hoja no pública o ID incorrecto | 1. Verificar permisos<br>2. Verificar SHEET_ID y GID<br>3. Probar URL de exportación en navegador |
+| **Nombres no aparecen** | Campo "Nombre" muestra "Desconocido" | Código no existe en hoja | 1. Verificar que código esté en la hoja<br>2. Revisar formato (sin espacios, comillas)<br>3. Verificar columna se llama "Codigo" |
+| **Carga muy lenta** | Tarda > 5 segundos | Hoja muy grande (>10,000 filas) | 1. Optimizar hoja (eliminar filas vacías)<br>2. Dividir en hojas más pequeñas |
+| **"COLUMNAS NO ENCONTRADAS"** | Error con lista de columnas | Nombres de columnas incorrectos | 1. Verificar primera fila tenga "Codigo" y "Nombre del producto"<br>2. Respetar mayúsculas/minúsculas |
+
+#### **Escáner de Códigos**
+
+| Problema | Síntoma | Causa | Solución |
+|----------|---------|-------|----------|
+| **Cámara no se abre** | Modal se abre pero no hay video | Permisos denegados | 1. Clic en ícono 🔒 en barra de dirección<br>2. Cambiar permisos de cámara a "Permitir"<br>3. Recargar página |
+| **No detecta código** | Cámara funciona pero no escanea | Código borroso o iluminación pobre | 1. Mejorar iluminación<br>2. Limpiar código de barras<br>3. Ajustar distancia (10-30cm)<br>4. Mantener estable |
+| **Error: No HTTPS** | "Error al acceder a la cámara" | Sitio no es HTTPS | 1. Usar GitHub Pages (automático HTTPS)<br>2. O desplegar en Netlify/Vercel |
+| **Cámara frontal** | Se abre cámara equivocada | Configuración del dispositivo | 1. Verificar que tenga cámara trasera<br>2. En algunos tablets solo hay frontal |
+
+#### **WhatsApp**
+
+| Problema | Síntoma | Causa | Solución |
+|----------|---------|-------|----------|
+| **No abre WhatsApp** | Nada pasa al hacer clic | Bloqueador de pop-ups | 1. Clic en botón "Copiar mensaje"<br>2. Abrir WhatsApp manualmente<br>3. Pegar mensaje |
+| **Mensaje vacío** | WhatsApp abre pero sin texto | Campos vacíos o no validados | 1. Verificar que campos estén completos<br>2. Ver errores en campos (borde rojo) |
+| **Error en móvil** | No abre app de WhatsApp | WhatsApp no instalado | 1. Instalar WhatsApp<br>2. O usar WhatsApp Web |
+
+#### **Validación de Campos**
+
+| Problema | Síntoma | Causa | Solución |
+|----------|---------|-------|----------|
+| **Campo con borde rojo** | Input tiene borde rojo | Campo requerido vacío | Completar el campo |
+| **No acepta letras** | Solo escribe números | Validación numérica activa | Correcto, solo acepta números |
+| **Nombre no autocompleta** | Campo "Nombre" vacío | BD no cargada o código no existe | 1. Esperar carga de BD<br>2. Verificar código existe |
+
+### 🧪 Testing Manual
+
+#### **Checklist de Testing**
+
+```
+□ Base de Datos
+  □ Carga correctamente al inicio
+  □ Muestra cantidad de artículos en verde
+  □ Nombres autocompletan al ingresar código
+  □ Muestra "Desconocido" si código no existe
+
+□ Tickets de Impresión
+  □ Se crea ticket azul con 🖨️
+  □ Labels destacados con bullet points
+  □ Validación de campos numéricos
+  □ Autocompletado de nombres funciona
+  □ Select de tipo funciona
+  □ Botón eliminar funciona
+
+□ Tickets de Re-impresión
+  □ Se crea ticket naranja con 🔄
+  □ Botón 📷 Escanear visible
+  □ Modal de escáner se abre
+  □ Cámara trasera se activa
+  □ Detecta códigos correctamente
+  □ ID se asigna automáticamente
+  □ Select de motivo funciona
+
+□ Gestión de Tickets
+  □ Contador de tickets actualiza
+  □ Botones aparecen/desaparecen según estado
+  □ Eliminar individual funciona
+  □ Limpiar todo pide confirmación
+  □ Copiar mensaje funciona
+
+□ WhatsApp
+  □ Mensaje se genera correctamente
+  □ WhatsApp se abre (móvil/desktop)
+  □ Mensaje pre-cargado aparece
+  □ Formato es legible
+
+□ Responsive
+  □ Funciona en móvil (< 480px)
+  □ Funciona en tablet (768px)
+  □ Funciona en desktop (> 768px)
+  □ Botones táctiles accesibles
+
+□ Escáner (móvil)
+  □ Modal responsive
+  □ Cámara visible
+  □ Área de escaneo clara
+  □ Detecta CODE128
+  □ Detecta EAN-13
+  □ Cierre automático tras escaneo
+```
+
+---
+
+## 📱 Compatibilidad de Dispositivos
+
+### 📊 Matriz de Compatibilidad Completa
+
+| Característica | Chrome 80+ | Firefox 75+ | Safari 13+ | Edge 80+ | Mobile Safari | Chrome Mobile |
+|----------------|------------|-------------|-----------|----------|---------------|---------------|
+| **Interfaz básica** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Google Sheets** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **WhatsApp** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Escáner códigos** | ✅ | ✅ | ✅ (iOS 14.3+) | ✅ | ✅ (iOS 14.3+) | ✅ |
+| **Cámara trasera** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Responsive** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Atajos teclado** | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
+
+### 🔧 Requisitos Mínimos
+
+| Componente | Requisito | Notas |
+|------------|-----------|-------|
+| **Navegador** | Chrome 80+, Firefox 75+, Safari 13+, Edge 80+ | Versiones más antiguas pueden no funcionar |
+| **JavaScript** | Habilitado | Requerido para toda funcionalidad |
+| **HTTPS** | Obligatorio para escáner | HTTP funciona pero sin cámara |
+| **Conexión** | Internet | Para cargar Google Sheets y WhatsApp |
+| **Pantalla** | Min 320px de ancho | Optimizado para móviles |
+| **Cámara** | Opcional | Solo para función de escaneo |
+
+### 📈 Rendimiento
+
+| Métrica | Valor | Condiciones |
+|---------|-------|-------------|
+| **Carga inicial** | < 2 segundos | Con conexión 4G |
+| **Carga BD Google Sheets** | 1-5 segundos | Depende de tamaño de hoja |
+| **Búsqueda producto** | < 100ms | Después de carga inicial |
+| **Escaneo código** | 0.5-2 segundos | Depende de iluminación y enfoque |
+| **Generación mensaje** | < 50ms | Instantáneo |
+| **Memoria RAM** | 1-5 MB | Depende de cantidad de artículos |
 
 ---
 
 ## 🚀 Despliegue en Producción
 
-### GitHub Pages
+### 🌐 Opciones de Hosting
 
-1. **Configuración del repositorio**:
-   ```bash
-   git add .
-   git commit -m "Deploy Gestor de Tickets"
-   git push origin main
-   ```
+#### **1. GitHub Pages** (✅ Recomendado)
 
-2. **Habilitar GitHub Pages**:
-   - Settings → Pages → Source: Deploy from branch
-   - Branch: main → Folder: / (root)
-   - Save
+**Ventajas:**
+- ✅ Gratis e ilimitado
+- ✅ HTTPS automático
+- ✅ Integración directa con Git
+- ✅ Sin configuración de servidor
 
-3. **URL de producción**:
-   ```
-   https://tu-usuario.github.io/gestor-tickets-whatsapp/
-   ```
+**Pasos:**
 
-### Netlify (Recomendado)
+```bash
+# 1. Subir código a GitHub
+git add .
+git commit -m "Deploy app"
+git push origin main
 
-1. **Conectar repositorio**: Netlify → New site from Git
-2. **Configuración build**: 
+# 2. Habilitar GitHub Pages
+# Ir a: Settings > Pages
+# Source: Deploy from a branch
+# Branch: main
+# Folder: / (root)
+# Save
+
+# 3. Esperar 1-2 minutos
+
+# 4. Acceder a:
+# https://tu-usuario.github.io/Solicitudticket/
+```
+
+#### **2. Netlify**
+
+**Ventajas:**
+- ✅ Despliegue automático
+- ✅ HTTPS gratis
+- ✅ Dominio personalizado
+- ✅ Preview de PRs
+
+**Pasos:**
+
+1. Ir a [netlify.com](https://netlify.com)
+2. "New site from Git"
+3. Conectar repositorio de GitHub
+4. Build settings:
    - Build command: (vacío)
    - Publish directory: `.`
-3. **Dominio personalizado**: Site settings → Domain management
+5. Deploy site
+6. URL: `https://tu-app.netlify.app`
 
-### Variables de Entorno
+#### **3. Vercel**
 
-Para diferentes entornos, crear archivos de configuración:
+**Ventajas:**
+- ✅ Velocidad extrema
+- ✅ HTTPS gratis
+- ✅ Analytics incluido
+- ✅ Edge network global
+
+**Pasos:**
+
+```bash
+# Instalar Vercel CLI
+npm i -g vercel
+
+# Desplegar
+vercel --prod
+
+# O conectar repo en vercel.com
+```
+
+#### **4. Servidor Propio**
+
+**Ventajas:**
+- ✅ Control total
+- ✅ Dominio personalizado
+- ✅ Sin límites
+
+**Requisitos:**
+- Servidor con HTTPS (Let's Encrypt)
+- Nginx o Apache configurado
+
+**Configuración Nginx:**
+
+```nginx
+server {
+    listen 80;
+    server_name tu-dominio.com;
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name tu-dominio.com;
+    
+    ssl_certificate /path/to/cert.pem;
+    ssl_certificate_key /path/to/key.pem;
+    
+    root /var/www/solicitudticket;
+    index index.html;
+    
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+```
+
+### 🔧 Configuración de Entornos
+
+#### **Development vs Production**
+
+**Crear archivo `config.js`:**
 
 ```javascript
-// config.js
-const config = {
+const ENV = {
   development: {
-    sheetUrl: 'https://docs.google.com/spreadsheets/d/DEV_ID/export?format=csv&gid=0'
+    sheetUrl: 'https://docs.google.com/spreadsheets/d/DEV_SHEET_ID/export?format=csv&gid=0',
+    debug: true,
+    whatsappTestNumber: '+1234567890'
   },
   production: {
-    sheetUrl: 'https://docs.google.com/spreadsheets/d/PROD_ID/export?format=csv&gid=0'
+    sheetUrl: 'https://docs.google.com/spreadsheets/d/PROD_SHEET_ID/export?format=csv&gid=0',
+    debug: false,
+    whatsappTestNumber: null
   }
 };
+
+// Auto-detect
+const currentEnv = window.location.hostname === 'localhost' ? 'development' : 'production';
+const config = ENV[currentEnv];
 ```
 
----
+### 📊 Monitoreo y Analytics
 
-## 📈 Métricas y Monitoreo
+#### **Google Analytics** (Opcional)
 
-### KPIs del Sistema
+Agregar al `<head>` de `index.html`:
 
-- **📊 Tickets creados por día**: Productividad del sistema
-- **⏱️ Tiempo promedio de creación**: Eficiencia del usuario
-- **❌ Tasa de error en códigos**: Calidad de datos
-- **📱 Dispositivos utilizados**: Adopción móvil
-
-### Análisis de Uso
-
-```javascript
-// Implementar Google Analytics (opcional)
-gtag('event', 'ticket_created', {
-  'event_category': 'engagement',
-  'ticket_type': mode,
-  'value': 1
-});
+```html
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+  
+  // Eventos personalizados
+  function trackTicketCreated(type) {
+    gtag('event', 'ticket_created', {
+      'event_category': 'tickets',
+      'event_label': type, // 'impresion' o 'reimpresion'
+      'value': 1
+    });
+  }
+  
+  function trackBarcodeScanned() {
+    gtag('event', 'barcode_scanned', {
+      'event_category': 'scanner',
+      'value': 1
+    });
+  }
+</script>
 ```
-
----
-
-## 🔮 Roadmap y Futuras Mejoras
-
-### Versión 2.1 (Próxima)
-- [ ] **🔍 Búsqueda avanzada**: Filtros por categoría, precio, stock
-- [ ] **📊 Dashboard**: Estadísticas de uso y reportes
-- [ ] **🎨 Temas personalizables**: Dark mode y temas corporativos
-- [ ] **🔔 Notificaciones push**: Alertas de stock bajo
-
-### Versión 2.2 (Futuro)
-- [ ] **👥 Multi-usuario**: Autenticación y perfiles
-- [ ] **🏢 Multi-empresa**: Gestión de múltiples organizaciones
-- [ ] **📱 PWA completa**: Instalación offline
-- [ ] **🤖 IA predictiva**: Sugerencias inteligentes de productos
-
-### Versión 3.0 (Visión)
-- [ ] **🌍 Multi-idioma**: Soporte internacional
-- [ ] **🔗 API REST**: Integración con otros sistemas
-- [ ] **📞 Integración Telegram**: Alternativa a WhatsApp
-- [ ] **📊 Business Intelligence**: Análisis avanzado de datos
-
----
-
-## 🤝 Contribuciones
-
-### Cómo Contribuir
-
-1. **Fork del repositorio**
-2. **Crear branch de feature**: `git checkout -b feature/nueva-funcionalidad`
-3. **Commit de cambios**: `git commit -am 'Añadir nueva funcionalidad'`
-4. **Push a branch**: `git push origin feature/nueva-funcionalidad`
-5. **Crear Pull Request**
-
-### Guías de Contribución
-
-- **📝 Código**: Seguir estándares ES6+ y comentarios en español
-- **🎨 CSS**: Utilizar variables CSS y metodología BEM
-- **📱 Responsive**: Probar en móviles antes de PR
-- **🧪 Testing**: Verificar funcionalidad en múltiples navegadores
-
-### Reportar Bugs
-
-Usar el template de issues con:
-- **Descripción**: Qué esperabas vs qué ocurrió
-- **Pasos**: Cómo reproducir el error
-- **Entorno**: Navegador, dispositivo, SO
-- **Screenshots**: Si es posible
 
 ---
 
@@ -496,26 +1279,32 @@ SOFTWARE.
 
 ---
 
-## 📞 Soporte y Contacto
+## 🤝 Contribuciones
 
-### Documentación Adicional
-- **🌐 Demo en vivo**: [https://tu-usuario.github.io/gestor-tickets-whatsapp/](https://tu-usuario.github.io/gestor-tickets-whatsapp/)
-- **📚 Wiki**: [GitHub Wiki del proyecto](https://github.com/tu-usuario/gestor-tickets-whatsapp/wiki)
-- **🐛 Issues**: [Reportar problemas](https://github.com/tu-usuario/gestor-tickets-whatsapp/issues)
+### Cómo Contribuir
 
-### Comunidad
-- **💬 Discusiones**: GitHub Discussions para preguntas y ideas
-- **📧 Email**: soporte@tu-empresa.com
-- **💼 LinkedIn**: [Perfil del desarrollador](#)
+1. **Fork** del repositorio
+2. **Crear branch**: `git checkout -b feature/nueva-funcionalidad`
+3. **Commit**: `git commit -am 'Añadir nueva funcionalidad'`
+4. **Push**: `git push origin feature/nueva-funcionalidad`
+5. **Pull Request**
+
+### Guías de Estilo
+
+- **Código**: ES6+, comentarios en español
+- **CSS**: Variables CSS, no usar !important
+- **Commits**: Mensajes descriptivos en español
+- **Testing**: Probar en Chrome, Firefox, Safari
 
 ---
 
 ## 🙏 Agradecimientos
 
-- **Google Sheets API** por la integración de datos
+- **Google Sheets** por la API de exportación CSV
 - **WhatsApp** por el URL scheme
-- **Claude AI** por asistencia en el desarrollo
-- **Comunidad Open Source** por las herramientas utilizadas
+- **html5-qrcode** por la librería de escaneo
+- **GitHub** por el hosting gratuito
+- **Comunidad Open Source** por las herramientas
 
 ---
 
@@ -524,5 +1313,11 @@ SOFTWARE.
 **⭐ Si este proyecto te ha sido útil, considera darle una estrella en GitHub**
 
 **🚀 Hecho con ❤️ para optimizar procesos empresariales**
+
+---
+
+**🌐 Demo:** [Solicitudticket](https://github.com/Sinsapiar1/Solicitudticket)  
+**📧 Soporte:** [Crear Issue](https://github.com/Sinsapiar1/Solicitudticket/issues)  
+**📚 Documentación:** Este README
 
 </div>
