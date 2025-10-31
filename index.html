@@ -184,33 +184,92 @@
       flex-direction: column;
       gap: 16px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      transition: all 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
+      border-left: 4px solid var(--border);
     }
     
-    .ticket-card:hover {
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-      border-color: var(--red);
+    /* Estilos específicos para Ticket de Impresión */
+    .ticket-card[data-kind="impresion"] {
+      border-left-color: #3b82f6;
+      background: linear-gradient(to right, rgba(59, 130, 246, 0.02) 0%, var(--white) 100%);
     }
+    
+    .ticket-card[data-kind="impresion"]:hover {
+      box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15);
+      border-left-color: #2563eb;
+      transform: translateY(-2px);
+    }
+    
+    /* Estilos específicos para Ticket de Re-impresión */
+    .ticket-card[data-kind="reimpresion"] {
+      border-left-color: #f59e0b;
+      background: linear-gradient(to right, rgba(245, 158, 11, 0.02) 0%, var(--white) 100%);
+    }
+    
+    .ticket-card[data-kind="reimpresion"]:hover {
+      box-shadow: 0 4px 20px rgba(245, 158, 11, 0.15);
+      border-left-color: #d97706;
+      transform: translateY(-2px);
+    }
+    
+    /* Hover general removido - ahora es específico por tipo */
     
     .ticket-card .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      color: var(--red-dark);
       font-weight: 600;
       font-size: 1.1rem;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      margin: -20px -20px 16px -20px;
+      border-radius: 8px 8px 0 0;
+      border-bottom: 2px solid var(--border);
+    }
+    
+    /* Header para Impresión */
+    .ticket-card[data-kind="impresion"] .header {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      color: #1e40af;
+      border-bottom-color: #3b82f6;
+    }
+    
+    /* Header para Re-impresión */
+    .ticket-card[data-kind="reimpresion"] .header {
+      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+      color: #92400e;
+      border-bottom-color: #f59e0b;
+    }
+    
+    .ticket-card .header .title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .ticket-card .header .icon {
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
     }
     
     .ticket-card .header .badge {
-      background: var(--red);
       color: var(--white);
       font-size: 0.75rem;
-      padding: 4px 8px;
+      padding: 4px 10px;
       border-radius: 12px;
-      font-weight: 500;
+      font-weight: 600;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Badge para Impresión */
+    .ticket-card[data-kind="impresion"] .header .badge {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    }
+    
+    /* Badge para Re-impresión */
+    .ticket-card[data-kind="reimpresion"] .header .badge {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
     }
     
     .ticket-card .fields {
@@ -226,17 +285,27 @@
     }
     
     .field label {
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: var(--gray-dark);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #1f2937;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
+      letter-spacing: 0.01em;
+      margin-bottom: 2px;
+    }
+    
+    .field label::before {
+      content: '▪';
+      color: #9ca3af;
+      font-size: 0.7rem;
     }
     
     .field label .required {
-      color: var(--red);
-      font-size: 0.8rem;
+      color: #ef4444;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-left: 2px;
     }
     
     .field input, .field select {
@@ -687,6 +756,20 @@
       .empty-state .icon {
         font-size: 2.5rem;
       }
+      
+      .ticket-card .header {
+        padding: 10px 12px;
+        margin: -20px -16px 12px -16px;
+        font-size: 1rem;
+      }
+      
+      .ticket-card .header .icon {
+        font-size: 1.1rem;
+      }
+      
+      .field label {
+        font-size: 0.9rem;
+      }
     }
     
     /* Responsive Design */
@@ -827,6 +910,29 @@
         width: 18px;
         height: 18px;
       }
+      
+      .ticket-card .header {
+        padding: 8px 10px;
+        margin: -12px -12px 12px -12px;
+        font-size: 0.95rem;
+      }
+      
+      .ticket-card .header .icon {
+        font-size: 1rem;
+      }
+      
+      .ticket-card .header .badge {
+        font-size: 0.7rem;
+        padding: 3px 8px;
+      }
+      
+      .field label {
+        font-size: 0.85rem;
+      }
+      
+      .field label::before {
+        font-size: 0.6rem;
+      }
     }
   </style>
 </head>
@@ -910,7 +1016,11 @@
   <template id="tplImp">
     <div class="ticket-card" data-kind="impresion">
       <div class="header">
-        <span>Ticket de Impresión <span class="badge" id="ticketNumber"></span></span>
+        <div class="title">
+          <span class="icon">🖨️</span>
+          <span>Ticket de Impresión</span>
+          <span class="badge" id="ticketNumber"></span>
+        </div>
         <button class="remove-btn" data-action="remove">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="3 6 5 6 21 6"></polyline>
@@ -948,7 +1058,11 @@
   <template id="tplReimp">
     <div class="ticket-card" data-kind="reimpresion">
       <div class="header">
-        <span>Ticket de Re-impresión <span class="badge" id="ticketNumber"></span></span>
+        <div class="title">
+          <span class="icon">🔄</span>
+          <span>Ticket de Re-impresión</span>
+          <span class="badge" id="ticketNumber"></span>
+        </div>
         <button class="remove-btn" data-action="remove">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="3 6 5 6 21 6"></polyline>
