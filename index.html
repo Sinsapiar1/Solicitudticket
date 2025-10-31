@@ -137,17 +137,42 @@
     
     .empty-state {
       text-align: center;
-      padding: 40px 20px;
+      padding: 60px 20px;
       color: var(--text-light);
-      background: var(--gray-light);
-      border-radius: 8px;
-      border: 2px dashed var(--border);
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+      border-radius: 12px;
+      border: 2px dashed rgba(102, 126, 234, 0.3);
+      animation: pulseEmptyState 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulseEmptyState {
+      0%, 100% {
+        border-color: rgba(102, 126, 234, 0.3);
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+      }
+      50% {
+        border-color: rgba(102, 126, 234, 0.5);
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+      }
     }
     
     .empty-state h3 {
-      margin: 0 0 8px 0;
-      font-size: 1.1rem;
+      margin: 0 0 12px 0;
+      font-size: 1.3rem;
       color: var(--gray-dark);
+      font-weight: 600;
+    }
+    
+    .empty-state .icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+      display: block;
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
     }
     
     .ticket-card {
@@ -277,19 +302,30 @@
     }
     
     .remove-btn {
-      background: none;
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
       border: none;
-      color: var(--text-light);
+      color: var(--white);
       cursor: pointer;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 0.9rem;
-      transition: all 0.2s ease;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(238, 90, 111, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
     
     .remove-btn:hover {
-      background: #fed7d7;
-      color: #c53030;
+      background: linear-gradient(135deg, #ee5a6f 0%, #c92a2a 100%);
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 4px 16px rgba(238, 90, 111, 0.5);
+    }
+    
+    .remove-btn:active {
+      transform: translateY(0) scale(0.98);
+      box-shadow: 0 2px 4px rgba(238, 90, 111, 0.3);
     }
     
     .actions {
@@ -313,14 +349,40 @@
     }
     
     .actions button.secondary {
-      background: var(--gray-light);
-      color: var(--gray-dark);
-      border: 1px solid var(--border);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: var(--white);
+      border: none;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .actions button.secondary::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+    
+    .actions button.secondary:hover::before {
+      width: 300px;
+      height: 300px;
     }
     
     .actions button.secondary:hover {
-      background: var(--gray-dark);
-      color: var(--white);
+      background: linear-gradient(135deg, #5a67d8 0%, #6b46a0 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    }
+    
+    .actions button.secondary:active {
+      transform: translateY(0);
     }
     
     .actions button.primary {
@@ -607,6 +669,24 @@
       .scanner-modal-header h3 {
         font-size: 1.1rem;
       }
+      
+      .remove-btn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+      }
+      
+      .remove-btn svg {
+        width: 14px;
+        height: 14px;
+      }
+      
+      .empty-state {
+        padding: 40px 16px;
+      }
+      
+      .empty-state .icon {
+        font-size: 2.5rem;
+      }
     }
     
     /* Responsive Design */
@@ -723,6 +803,30 @@
       .scanner-modal-actions {
         flex-direction: column;
       }
+      
+      .remove-btn {
+        padding: 5px 10px;
+        font-size: 0.75rem;
+        border-radius: 16px;
+      }
+      
+      .remove-btn svg {
+        width: 12px;
+        height: 12px;
+      }
+      
+      .empty-state .icon {
+        font-size: 2rem;
+      }
+      
+      .empty-state h3 {
+        font-size: 1.1rem;
+      }
+      
+      #addBtn svg {
+        width: 18px;
+        height: 18px;
+      }
     }
   </style>
 </head>
@@ -742,8 +846,10 @@
     <div class="content">
       <div class="stack" id="forms">
         <div class="empty-state">
-          <h3>No hay tickets creados</h3>
-          <p>Haz clic en "Agregar ticket" para comenzar</p>
+          <span class="icon">🎫</span>
+          <h3>¡Comienza creando un ticket!</h3>
+          <p>Selecciona <strong>Impresión</strong> o <strong>Re-impresión</strong> arriba</p>
+          <p style="margin-top: 8px; font-size: 0.9rem;">Luego haz clic en el botón <strong>"➕ Agregar ticket"</strong> abajo</p>
         </div>
       </div>
       
@@ -757,7 +863,13 @@
       </div>
       
       <div class="actions">
-        <button id="addBtn" class="secondary">+ Agregar ticket</button>
+        <button id="addBtn" class="secondary">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="position: relative; z-index: 1;">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span style="position: relative; z-index: 1;">Agregar ticket</span>
+        </button>
         <button id="clearBtn" class="danger" style="display: none;">x Limpiar todo</button>
         <button id="copyBtn" class="secondary" style="display: none;">Copiar mensaje</button>
         <button id="sendBtn" class="primary">Enviar por WhatsApp</button>
@@ -799,7 +911,15 @@
     <div class="ticket-card" data-kind="impresion">
       <div class="header">
         <span>Ticket de Impresión <span class="badge" id="ticketNumber"></span></span>
-        <button class="remove-btn" data-action="remove">x Eliminar</button>
+        <button class="remove-btn" data-action="remove">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            <line x1="10" y1="11" x2="10" y2="17"></line>
+            <line x1="14" y1="11" x2="14" y2="17"></line>
+          </svg>
+          <span>Eliminar</span>
+        </button>
       </div>
       <div class="fields">
         <div class="field">
@@ -829,7 +949,15 @@
     <div class="ticket-card" data-kind="reimpresion">
       <div class="header">
         <span>Ticket de Re-impresión <span class="badge" id="ticketNumber"></span></span>
-        <button class="remove-btn" data-action="remove">x Eliminar</button>
+        <button class="remove-btn" data-action="remove">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            <line x1="10" y1="11" x2="10" y2="17"></line>
+            <line x1="14" y1="11" x2="14" y2="17"></line>
+          </svg>
+          <span>Eliminar</span>
+        </button>
       </div>
       <div class="fields">
         <div class="field-with-button">
@@ -1124,8 +1252,10 @@
         if (!forms.querySelector('.empty-state')) {
           forms.innerHTML = `
             <div class="empty-state">
-              <h3>No hay tickets creados</h3>
-              <p>Haz clic en "Agregar ticket" para comenzar</p>
+              <span class="icon">🎫</span>
+              <h3>¡Comienza creando un ticket!</h3>
+              <p>Selecciona <strong>Impresión</strong> o <strong>Re-impresión</strong> arriba</p>
+              <p style="margin-top: 8px; font-size: 0.9rem;">Luego haz clic en el botón <strong>"➕ Agregar ticket"</strong> abajo</p>
             </div>
           `;
         }
@@ -1646,10 +1776,8 @@
     // Cargar base de datos de artículos al inicio
     loadArticulosDB();
     
-    // Agregar primer ticket automáticamente
-    setTimeout(() => {
-      addTicket();
-    }, 500);
+    // No agregar ticket automáticamente - dejar que usuario elija primero
+    // El usuario debe seleccionar Impresión o Re-impresión y luego hacer clic en Agregar ticket
   </script>
 </body>
 </html>
