@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Gestor de Tickets · WhatsApp</title>
+  <!-- html5-qrcode para escaneo de códigos de barra con cámara -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <style>
     /* Variables de color */
     :root {
@@ -398,6 +400,215 @@
       color: var(--text-light);
     }
     
+    /* Estilos para botón de escaneo de código de barras */
+    .field-with-button {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+    
+    .field-with-button .field {
+      flex: 1;
+    }
+    
+    .scan-barcode-btn {
+      padding: 10px 16px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: var(--white);
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      min-height: 42px;
+      box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+    }
+    
+    .scan-barcode-btn:hover {
+      background: linear-gradient(135deg, #5a67d8 0%, #6b46a0 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+    }
+    
+    .scan-barcode-btn:active {
+      transform: translateY(0);
+    }
+    
+    /* Modal para escáner de código de barras */
+    .scanner-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 20px;
+    }
+    
+    .scanner-modal.show {
+      display: flex;
+    }
+    
+    .scanner-modal-content {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 24px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      animation: modalSlideIn 0.3s ease-out;
+    }
+    
+    @keyframes modalSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    
+    .scanner-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--border);
+    }
+    
+    .scanner-modal-header h3 {
+      margin: 0;
+      color: var(--red-dark);
+      font-size: 1.3rem;
+    }
+    
+    .scanner-modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-light);
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .scanner-modal-close:hover {
+      background: var(--gray-light);
+      color: var(--red);
+    }
+    
+    .scanner-container {
+      background: #000;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    
+    #reader {
+      width: 100%;
+      border: none;
+    }
+    
+    .scanner-info {
+      background: var(--gray-light);
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      border-left: 4px solid #667eea;
+    }
+    
+    .scanner-info p {
+      margin: 4px 0;
+      font-size: 0.9rem;
+      color: var(--gray-dark);
+    }
+    
+    .scanner-result {
+      background: var(--success);
+      color: var(--white);
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .scanner-result.show {
+      display: flex;
+    }
+    
+    .scanner-result strong {
+      font-size: 1.1rem;
+    }
+    
+    .scanner-modal-actions {
+      display: flex;
+      gap: 12px;
+    }
+    
+    .scanner-modal-actions button {
+      flex: 1;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-cancel {
+      background: var(--gray-light);
+      color: var(--gray-dark);
+      border: 1px solid var(--border);
+    }
+    
+    .btn-cancel:hover {
+      background: var(--gray-dark);
+      color: var(--white);
+    }
+    
+    /* Responsive para botón de escaneo */
+    @media (max-width: 768px) {
+      .field-with-button {
+        flex-direction: column;
+        gap: 12px;
+      }
+      
+      .scan-barcode-btn {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      .scanner-modal-content {
+        padding: 20px;
+        margin: 0 10px;
+      }
+      
+      .scanner-modal-header h3 {
+        font-size: 1.1rem;
+      }
+    }
+    
     /* Responsive Design */
     @media (max-width: 768px) {
       body {
@@ -498,6 +709,20 @@
       .ticket-card .fields {
         grid-template-columns: 1fr !important;
       }
+      
+      .scanner-modal-content {
+        padding: 16px;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      
+      .scanner-modal-header h3 {
+        font-size: 1rem;
+      }
+      
+      .scanner-modal-actions {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
@@ -541,6 +766,33 @@
   </div>
   
   <div class="toast" id="toast"></div>
+  
+  <!-- Modal para escáner de código de barras -->
+  <div class="scanner-modal" id="scannerModal">
+    <div class="scanner-modal-content">
+      <div class="scanner-modal-header">
+        <h3>📷 Escanear Código de Barras</h3>
+        <button class="scanner-modal-close" id="closeScannerModal" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="scanner-info">
+        <p>📍 Apunta la cámara al código de barras</p>
+        <p>El escaneo es automático cuando detecte el código</p>
+      </div>
+      <div class="scanner-result" id="scannerResult">
+        <span>✅</span>
+        <div>
+          <strong>Código detectado:</strong>
+          <span id="scannedCode"></span>
+        </div>
+      </div>
+      <div class="scanner-container">
+        <div id="reader"></div>
+      </div>
+      <div class="scanner-modal-actions">
+        <button class="btn-cancel" id="cancelScanner">Cancelar</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Templates -->
   <template id="tplImp">
@@ -580,9 +832,15 @@
         <button class="remove-btn" data-action="remove">x Eliminar</button>
       </div>
       <div class="fields">
-        <div class="field">
-          <label>ID de Artículo <span class="required">*</span></label>
-          <input type="text" class="idart" placeholder="Solo números: 987654" required autocomplete="off" pattern="[0-9]*" inputmode="numeric">
+        <div class="field-with-button">
+          <div class="field">
+            <label>ID de Artículo <span class="required">*</span></label>
+            <input type="text" class="idart" placeholder="Solo números: 987654" required autocomplete="off" pattern="[0-9]*" inputmode="numeric">
+          </div>
+          <button class="scan-barcode-btn" data-action="scan-barcode" title="Escanear con cámara">
+            <span>📷</span>
+            <span class="btn-text">Escanear</span>
+          </button>
         </div>
         <div class="field">
           <label>Motivo de Re-impresión</label>
@@ -1180,8 +1438,141 @@
       }
     }
 
+    // ==========================================
+    // FUNCIONALIDAD DE ESCÁNER DE CÓDIGO DE BARRAS
+    // ==========================================
+    
+    let html5QrcodeScanner = null;
+    let currentInputTarget = null;
+    const scannerModal = document.getElementById('scannerModal');
+    const closeScannerModal = document.getElementById('closeScannerModal');
+    const cancelScanner = document.getElementById('cancelScanner');
+    const scannerResult = document.getElementById('scannerResult');
+    const scannedCode = document.getElementById('scannedCode');
+
+    // Iniciar escáner de código de barras
+    function startBarcodeScanner(inputElement) {
+      currentInputTarget = inputElement;
+      
+      // Mostrar modal
+      scannerModal.classList.add('show');
+      scannerResult.classList.remove('show');
+      
+      // Configurar y iniciar escáner
+      if (!html5QrcodeScanner) {
+        html5QrcodeScanner = new Html5Qrcode("reader");
+      }
+      
+      // Configuración del escáner
+      const config = {
+        fps: 10,
+        qrbox: { width: 250, height: 100 },
+        aspectRatio: 1.777778,
+        formatsToSupport: [
+          Html5QrcodeSupportedFormats.CODE_128,
+          Html5QrcodeSupportedFormats.CODE_39,
+          Html5QrcodeSupportedFormats.EAN_13,
+          Html5QrcodeSupportedFormats.EAN_8,
+          Html5QrcodeSupportedFormats.UPC_A,
+          Html5QrcodeSupportedFormats.UPC_E
+        ]
+      };
+      
+      // Iniciar cámara
+      html5QrcodeScanner.start(
+        { facingMode: "environment" }, // Cámara trasera
+        config,
+        onScanSuccess,
+        onScanError
+      ).catch(err => {
+        console.error('Error iniciando escáner:', err);
+        toastMsg('Error al acceder a la cámara. Verifica los permisos.', 3000, 'error');
+        stopBarcodeScanner();
+      });
+      
+      toastMsg('Escáner activado. Apunta al código de barras.', 2000, 'success');
+    }
+
+    // Callback cuando se escanea exitosamente
+    function onScanSuccess(decodedText, decodedResult) {
+      console.log('Código escaneado:', decodedText);
+      
+      // Validar que sea numérico (puedes ajustar esto según necesites)
+      const cleanedCode = decodedText.replace(/[^0-9]/g, '');
+      
+      if (cleanedCode) {
+        // Mostrar resultado
+        scannedCode.textContent = cleanedCode;
+        scannerResult.classList.add('show');
+        
+        // Asignar al campo de entrada
+        if (currentInputTarget) {
+          currentInputTarget.value = cleanedCode;
+          
+          // Disparar evento input para activar validaciones
+          const event = new Event('input', { bubbles: true });
+          currentInputTarget.dispatchEvent(event);
+        }
+        
+        // Detener escáner y cerrar después de 1.5 segundos
+        setTimeout(() => {
+          stopBarcodeScanner();
+          toastMsg(`Código ${cleanedCode} escaneado correctamente`, 2000, 'success');
+        }, 1500);
+      } else {
+        toastMsg('Código no válido. Intenta de nuevo.', 2000, 'error');
+      }
+    }
+
+    // Callback de errores (silencioso, solo para debugging)
+    function onScanError(errorMessage) {
+      // No mostrar errores continuos, solo en consola
+      // console.log('Escaneando...', errorMessage);
+    }
+
+    // Detener escáner
+    function stopBarcodeScanner() {
+      if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
+        html5QrcodeScanner.stop().then(() => {
+          scannerModal.classList.remove('show');
+          currentInputTarget = null;
+          scannerResult.classList.remove('show');
+        }).catch(err => {
+          console.error('Error deteniendo escáner:', err);
+          scannerModal.classList.remove('show');
+        });
+      } else {
+        scannerModal.classList.remove('show');
+      }
+    }
+
+    // Event Listeners para escáner
+    closeScannerModal.addEventListener('click', stopBarcodeScanner);
+    cancelScanner.addEventListener('click', stopBarcodeScanner);
+
+    // Cerrar modal con tecla Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && scannerModal.classList.contains('show')) {
+        stopBarcodeScanner();
+      }
+    });
+
     // Event Listeners
     forms.addEventListener('click', (e) => {
+      // Manejar botón de escanear código de barras
+      if (e.target.closest('[data-action="scan-barcode"]')) {
+        e.preventDefault();
+        const btn = e.target.closest('[data-action="scan-barcode"]');
+        const card = btn.closest('.ticket-card');
+        const idInput = card.querySelector('.idart');
+        
+        if (idInput) {
+          startBarcodeScanner(idInput);
+        }
+        return;
+      }
+      
+      // Manejar botón de eliminar ticket
       if (e.target.dataset.action === 'remove' || e.target.closest('[data-action="remove"]')) {
         const card = e.target.closest('.ticket-card');
         if (card) removeTicket(card);
